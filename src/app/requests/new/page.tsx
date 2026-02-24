@@ -102,16 +102,40 @@ export default function RequestFormPage() {
 
                 // alert('解析結果:\n' + JSON.stringify(result, null, 2))
 
-                // AI結果の反映（名前等）と同時に、もし既存の住所録とマッチ(address_id)していたら一括反映する
-                if (result.address_id) {
-                    console.log("AI returned address_id:", result.address_id, typeof result.address_id);
-                    // 型の違い（文字列と実数）を吸収するために文字列化して比較
-                    const targetId = String(result.address_id);
+                // AI結果の反映
+                let targetId = result.address_id ? String(result.address_id) : null;
+
+                // 【最重要】AIがIDを見つけられずテキストだけ返してきた場合の、フロントエンド側での強力な自力マッピング（部分一致検索）
+                if (!targetId && result.company_name) {
+                    console.log("AI couldn't find ID. Executing frontend fallback text search...");
+                    const safeCompany = result.company_name.toLowerCase();
+                    const safeContact = result.contact_name ? result.contact_name.toLowerCase() : '';
+
+                    const fallbackMatch = addressOptions.find(opt => {
+                        const optLabel = opt.label.toLowerCase(); // 会社名
+                        const optContact = (opt as any).contact_name?.toLowerCase() || ''; // 氏名
+
+                        // 会社名が部分一致（互いに含んでいるか）
+                        const isCompanyMatch = optLabel.includes(safeCompany) || safeCompany.includes(optLabel);
+                        // 氏名が指定されている場合は氏名も部分一致するか（指定がない場合は会社名だけでOKとする）
+                        const isContactMatch = safeContact ? (optContact.includes(safeContact) || safeContact.includes(optContact)) : true;
+
+                        return isCompanyMatch && isContactMatch;
+                    });
+
+                    if (fallbackMatch) {
+                        console.log("Fallback search matched!", fallbackMatch);
+                        targetId = String(fallbackMatch.value);
+                    }
+                }
+
+                if (targetId) {
+                    console.log("Matched targetId (AI or Fallback):", targetId);
                     const matchedOption = addressOptions.find(opt => String(opt.value) === targetId) as any
 
                     if (matchedOption) {
-                        console.log("Matched option found:", matchedOption);
-                        setSelectedAddress(matchedOption.value) // 実際の値をセットする
+                        console.log("Applying mapped address data:", matchedOption);
+                        setSelectedAddress(matchedOption.value) // Autocomplete上の選択状態にする（必須）
                         setFormData(prev => ({
                             ...prev,
                             companyName: matchedOption.label || '',
@@ -126,6 +150,9 @@ export default function RequestFormPage() {
                         return // マッチした場合はここで終了
                     }
                 }
+
+                // 完全に一致しなかった（新規）場合
+                console.log("No match found. Appling as new entry.");
 
                 // マッチしなかった場合はAIのテキスト解析結果だけを各項目に反映する
                 setFormData(prev => ({

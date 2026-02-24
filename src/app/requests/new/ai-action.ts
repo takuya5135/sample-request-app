@@ -8,21 +8,25 @@ const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY });
 export async function parseShippingRequest(input: string, addresses: any[], products: any[]) {
   try {
     const prompt = `
-あなたはサンプル発送の手配アシスタントです。
-以下のユーザー入力、および登録済みの「住所録」「商品リスト」から、発送に必要な情報を抽出してJSON形式で返してください。
+あなたは有能なデータ入力アシスタントです。
+ユーザーが入力した「サンプルの依頼内容（自然言語）」から必要な情報を抽出し、渡された【住所録データ】および【商品リストデータ】のレコードと正確にマッピング（紐付け）を行ってください。
+
+【最も重要なミッション】
+ユーザーは「既存の顧客」に対して送るケースがほとんどです。抽出した会社名や氏名ただテキストで返すだけでなく、**必ず以下の【住所録データ】の中から同一人物・同一会社と思われるIDを探し出し、\`address_id\` として返却してください。** 
+「旭食品」と「あんばい株式会社（旭食品）」のような表記揺れや一部の一致であっても、担当者名が一致するなどの条件から積極的に紐づけてください。
 
 【ユーザー入力】
 ${input}
 
-【住所録データ (JSON)】
-${JSON.stringify(addresses.map(a => ({ id: a.id, company_name: a.company_name, contact_name: a.contact_name, phone: a.phone })))}
+【住所録データ (JSON) ※ここからIDを探してください】
+${JSON.stringify(addresses.map(a => ({ id: a.id, company_name: a.company_name, department: a.department, contact_name: a.contact_name, phone: a.phone })))}
 
 【商品リストデータ (JSON)】
 ${JSON.stringify(products.map(p => ({ id: p.id, md_code: p.md_code, product_name: p.product_name })))}
 
 出力形式（JSON）:
 {
-  "address_id": "マッチした住所データのID（完全一致でなくても、会社名の一部や担当者名から推測して最も確からしい既存データのIDを積極的に返してください。全くの新規と明らかな場合のみ null）",
+  "address_id": "マッチした住所データのID（※最優先で探索し、どうしても見つからない完全新規の場合のみ null）",
   "company_name": "抽出された会社名（不明な場合は null）",
   "contact_name": "抽出された担当者名（不明な場合は null）",
   "phone": "抽出された電話番号（ハイフンあり。不明な場合は null）",
