@@ -8,6 +8,8 @@ import { DeleteAddressButton } from './delete-button'
 import { EditAddressDialog } from './edit-dialog'
 import { CreateAddressDialog } from './create-dialog'
 
+import { DuplicateAddressDialog } from './duplicate-dialog'
+
 export default async function AddressBookPage() {
     const supabase = (await createClient()) as any
     const { data: { user } } = await supabase.auth.getUser()
@@ -51,7 +53,7 @@ export default async function AddressBookPage() {
                                         <TableHead>部署名</TableHead>
                                         <TableHead>氏名</TableHead>
                                         <TableHead>電話番号</TableHead>
-                                        <TableHead className="w-[100px]"></TableHead>
+                                        <TableHead className="w-[120px]"></TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -61,7 +63,8 @@ export default async function AddressBookPage() {
                                             <TableCell>{address.department}</TableCell>
                                             <TableCell>{address.contact_name}</TableCell>
                                             <TableCell>{address.phone}</TableCell>
-                                            <TableCell className="text-right">
+                                            <TableCell className="text-right flex items-center justify-end gap-1">
+                                                <DuplicateAddressDialog address={address} />
                                                 <EditAddressDialog address={address} />
                                                 <DeleteAddressButton id={address.id} />
                                             </TableCell>
