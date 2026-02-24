@@ -28,6 +28,7 @@ export default function RequestFormPage() {
         department: '',
         zipCode: '',
         address: '',
+        phone: '',
         deliveryDate: '',
         deliveryTime: 'am',
         saveToAddressBook: false // 住所録へ保存するかどうか
@@ -53,7 +54,8 @@ export default function RequestFormPage() {
                 setAddressOptions(addresses.map((a: any) => ({
                     value: a.id,
                     label: a.company_name,
-                    description: `${a.address || '住所未登録'} / 担当: ${a.contact_name || '未登録'}`
+                    description: `${a.address || '住所未登録'} / 担当: ${a.contact_name || '未登録'}`,
+                    phone: a.phone
                 })))
             }
 
@@ -104,6 +106,7 @@ export default function RequestFormPage() {
                     department: prev.department, // プロンプトで未取得のためそのまま
                     zipCode: prev.zipCode, // プロンプトで未取得のためそのまま
                     address: prev.address, // プロンプトで未取得のためそのまま
+                    phone: result.phone || prev.phone,
                     deliveryDate: result.delivery_date || prev.deliveryDate,
                     deliveryTime: result.delivery_time || prev.deliveryTime
                 }))
@@ -125,6 +128,10 @@ export default function RequestFormPage() {
             }
             if (!formData.contactName) {
                 alert('送り先の担当者名を入力してください。')
+                return
+            }
+            if (!formData.phone) {
+                alert('送り先の電話番号を入力してください。')
                 return
             }
         }
@@ -243,7 +250,8 @@ export default function RequestFormPage() {
                                             setFormData(prev => ({
                                                 ...prev,
                                                 companyName: opt.label,
-                                                contactName: opt.description?.split('担当: ')[1] || prev.contactName
+                                                contactName: opt.description?.split('担当: ')[1] || prev.contactName,
+                                                phone: (opt as any).phone || prev.phone
                                             }))
                                         }
                                     }}
@@ -274,6 +282,15 @@ export default function RequestFormPage() {
                                         placeholder="例: 山田 太郎"
                                         value={formData.contactName}
                                         onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2 col-span-2 sm:col-span-1">
+                                    <Label>電話番号 <span className="text-red-500">*</span></Label>
+                                    <Input
+                                        placeholder="例: 03-1234-5678"
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        required={!selectedAddress}
                                     />
                                 </div>
                                 <div className="space-y-2 col-span-2 sm:col-span-1">

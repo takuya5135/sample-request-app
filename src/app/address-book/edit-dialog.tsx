@@ -129,7 +129,7 @@ export function EditAddressDialog({ address }: EditAddressDialogProps) {
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="phone" className="text-right text-xs">電話番号</Label>
+                            <Label htmlFor="phone" className="text-right text-xs">電話番号<span className="text-red-500 ml-1">*</span></Label>
                             <Input
                                 id="phone"
                                 value={formData.phone}

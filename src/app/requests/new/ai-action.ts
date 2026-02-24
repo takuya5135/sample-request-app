@@ -15,7 +15,7 @@ export async function parseShippingRequest(input: string, addresses: any[], prod
 ${input}
 
 【住所録データ (JSON)】
-${JSON.stringify(addresses.map(a => ({ id: a.id, company_name: a.company_name, contact_name: a.contact_name })))}
+${JSON.stringify(addresses.map(a => ({ id: a.id, company_name: a.company_name, contact_name: a.contact_name, phone: a.phone })))}
 
 【商品リストデータ (JSON)】
 ${JSON.stringify(products.map(p => ({ id: p.id, md_code: p.md_code, product_name: p.product_name })))}
@@ -25,6 +25,7 @@ ${JSON.stringify(products.map(p => ({ id: p.id, md_code: p.md_code, product_name
   "address_id": "マッチした住所データのID（不明な場合は null）",
   "company_name": "抽出された会社名（不明な場合は null）",
   "contact_name": "抽出された担当者名（不明な場合は null）",
+  "phone": "抽出された電話番号（ハイフンあり。不明な場合は null）",
   "products": [
     {
       "product_id": "マッチした商品データのID",

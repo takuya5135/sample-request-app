@@ -16,6 +16,10 @@ export async function createShippingRequest(formData: any) {
 
     // 1. 住所が新規（ID指定なし）の場合、address_bookに登録
     if (!addressId) {
+        if (!formData.phone) {
+            throw new Error('送り先の電話番号は必須です')
+        }
+
         const { data: newAddr, error: addrErr } = await supabase
             .from('address_book')
             .insert({
@@ -24,6 +28,7 @@ export async function createShippingRequest(formData: any) {
                 department: formData.department,
                 postal_code: formData.zipCode,
                 address: formData.address,
+                phone: formData.phone,
                 user_id: formData.saveToAddressBook ? user.id : null // 「保存する」にチェックがない場合は共通マスタとして扱うか、個人に紐付けない
             })
             .select()
