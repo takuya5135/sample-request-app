@@ -114,12 +114,12 @@ export default function RequestFormPage() {
                         setSelectedAddress(matchedOption.value) // 実際の値をセットする
                         setFormData(prev => ({
                             ...prev,
-                            companyName: matchedOption.label || prev.companyName,
-                            contactName: matchedOption.contact_name || prev.contactName,
-                            department: matchedOption.department || prev.department,
-                            zipCode: matchedOption.postal_code || prev.zipCode,
-                            address: matchedOption.address || prev.address,
-                            phone: matchedOption.phone || prev.phone,
+                            companyName: matchedOption.label || '',
+                            contactName: matchedOption.contact_name || '',
+                            department: matchedOption.department || '',
+                            zipCode: matchedOption.postal_code || '',
+                            address: matchedOption.address || '',
+                            phone: matchedOption.phone || '',
                             deliveryDate: result.delivery_date || prev.deliveryDate,
                             deliveryTime: result.delivery_time || prev.deliveryTime
                         }))
@@ -279,12 +279,12 @@ export default function RequestFormPage() {
                                             const aOpt = opt as any
                                             setFormData(prev => ({
                                                 ...prev,
-                                                companyName: aOpt.label,
-                                                contactName: aOpt.contact_name || prev.contactName,
-                                                department: aOpt.department || prev.department,
-                                                zipCode: aOpt.postal_code || prev.zipCode,
-                                                address: aOpt.address || prev.address,
-                                                phone: aOpt.phone || prev.phone
+                                                companyName: aOpt.label || '',
+                                                contactName: aOpt.contact_name || '',
+                                                department: aOpt.department || '',
+                                                zipCode: aOpt.postal_code || '',
+                                                address: aOpt.address || '',
+                                                phone: aOpt.phone || ''
                                             }))
                                         }
                                     }}
