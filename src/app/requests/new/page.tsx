@@ -104,9 +104,14 @@ export default function RequestFormPage() {
 
                 // AI結果の反映（名前等）と同時に、もし既存の住所録とマッチ(address_id)していたら一括反映する
                 if (result.address_id) {
-                    const matchedOption = addressOptions.find(opt => opt.value === result.address_id) as any
+                    console.log("AI returned address_id:", result.address_id, typeof result.address_id);
+                    // 型の違い（文字列と実数）を吸収するために文字列化して比較
+                    const targetId = String(result.address_id);
+                    const matchedOption = addressOptions.find(opt => String(opt.value) === targetId) as any
+
                     if (matchedOption) {
-                        setSelectedAddress(result.address_id)
+                        console.log("Matched option found:", matchedOption);
+                        setSelectedAddress(matchedOption.value) // 実際の値をセットする
                         setFormData(prev => ({
                             ...prev,
                             companyName: matchedOption.label || prev.companyName,
