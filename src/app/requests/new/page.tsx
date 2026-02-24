@@ -55,7 +55,11 @@ export default function RequestFormPage() {
                     value: a.id,
                     label: a.company_name,
                     description: `${a.address || '住所未登録'} / 担当: ${a.contact_name || '未登録'}`,
-                    phone: a.phone
+                    phone: a.phone,
+                    department: a.department,
+                    postal_code: a.postal_code,
+                    address: a.address,
+                    contact_name: a.contact_name
                 })))
             }
 
@@ -98,7 +102,27 @@ export default function RequestFormPage() {
 
                 // alert('解析結果:\n' + JSON.stringify(result, null, 2))
 
-                // 実際にはここで各入力フォームに反映する
+                // AI結果の反映（名前等）と同時に、もし既存の住所録とマッチ(address_id)していたら一括反映する
+                if (result.address_id) {
+                    const matchedOption = addressOptions.find(opt => opt.value === result.address_id) as any
+                    if (matchedOption) {
+                        setSelectedAddress(result.address_id)
+                        setFormData(prev => ({
+                            ...prev,
+                            companyName: matchedOption.label || prev.companyName,
+                            contactName: matchedOption.contact_name || prev.contactName,
+                            department: matchedOption.department || prev.department,
+                            zipCode: matchedOption.postal_code || prev.zipCode,
+                            address: matchedOption.address || prev.address,
+                            phone: matchedOption.phone || prev.phone,
+                            deliveryDate: result.delivery_date || prev.deliveryDate,
+                            deliveryTime: result.delivery_time || prev.deliveryTime
+                        }))
+                        return // マッチした場合はここで終了
+                    }
+                }
+
+                // マッチしなかった場合はAIのテキスト解析結果だけを各項目に反映する
                 setFormData(prev => ({
                     ...prev,
                     companyName: result.company_name || prev.companyName,
@@ -247,11 +271,15 @@ export default function RequestFormPage() {
                                     onChange={(val, opt) => {
                                         setSelectedAddress(val)
                                         if (opt) {
+                                            const aOpt = opt as any
                                             setFormData(prev => ({
                                                 ...prev,
-                                                companyName: opt.label,
-                                                contactName: opt.description?.split('担当: ')[1] || prev.contactName,
-                                                phone: (opt as any).phone || prev.phone
+                                                companyName: aOpt.label,
+                                                contactName: aOpt.contact_name || prev.contactName,
+                                                department: aOpt.department || prev.department,
+                                                zipCode: aOpt.postal_code || prev.zipCode,
+                                                address: aOpt.address || prev.address,
+                                                phone: aOpt.phone || prev.phone
                                             }))
                                         }
                                     }}
