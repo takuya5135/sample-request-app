@@ -48,13 +48,13 @@ export function Autocomplete({
             if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
                 setIsOpen(false)
                 // 選択されていなければ入力をリセットするか、完全一致を確認
-                const matched = options.find(opt => opt.label === inputValue)
-                if (matched) {
-                    onChange(matched.value, matched)
-                } else {
-                    // 自由入力も許容するかによるが、今回は選択必須とする場合はリセット
-                    // onChange('') 
-                    // setInputValue('')
+                // labelでの照合は、同名会社（別担当者）がいるケースで誤判定・上書きを引き起こすため削除。
+                // すでに value がセットされている状態で外をクリックした場合、
+                // inputValue と実際の value に紐付く label が一致しているかだけを確認する
+                const currentOpt = options.find(opt => opt.value === value)
+                if (currentOpt && currentOpt.label !== inputValue) {
+                    // もし入力途中で外をクリックしたら、元の選択状態のlabelに戻す
+                    setInputValue(currentOpt.label)
                 }
             }
         }
