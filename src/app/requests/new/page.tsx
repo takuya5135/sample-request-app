@@ -24,7 +24,8 @@ export default function RequestFormPage() {
 
     const [formData, setFormData] = useState({
         companyName: '',
-        contactName: '',
+        lastName: '',
+        firstName: '',
         department: '',
         zipCode: '',
         address: '',
@@ -54,12 +55,13 @@ export default function RequestFormPage() {
                 setAddressOptions(addresses.map((a: any) => ({
                     value: a.id,
                     label: a.company_name,
-                    description: `${a.address || '住所未登録'} / 担当: ${a.contact_name || '未登録'}`,
+                    description: `${a.address || '住所未登録'} / 担当: ${a.last_name || ''} ${a.first_name || ''}`,
                     phone: a.phone,
                     department: a.department,
                     postal_code: a.postal_code,
                     address: a.address,
-                    contact_name: a.contact_name
+                    last_name: a.last_name,
+                    first_name: a.first_name
                 })))
             }
 
@@ -113,7 +115,7 @@ export default function RequestFormPage() {
 
                     const fallbackMatch = addressOptions.find(opt => {
                         const optLabel = opt.label.toLowerCase(); // 会社名
-                        const optContact = (opt as any).contact_name?.toLowerCase() || ''; // 氏名
+                        const optContact = `${(opt as any).last_name || ''} ${(opt as any).first_name || ''}`.trim().toLowerCase(); // 氏名
 
                         // 会社名が部分一致（互いに含んでいるか）
                         const isCompanyMatch = optLabel.includes(safeCompany) || safeCompany.includes(optLabel);
@@ -139,7 +141,8 @@ export default function RequestFormPage() {
                         setFormData(prev => ({
                             ...prev,
                             companyName: matchedOption.label || '',
-                            contactName: matchedOption.contact_name || '',
+                            lastName: matchedOption.last_name || '',
+                            firstName: matchedOption.first_name || '',
                             department: matchedOption.department || '',
                             zipCode: matchedOption.postal_code || '',
                             address: matchedOption.address || '',
@@ -158,7 +161,8 @@ export default function RequestFormPage() {
                 setFormData(prev => ({
                     ...prev,
                     companyName: result.company_name || prev.companyName,
-                    contactName: result.contact_name || prev.contactName,
+                    lastName: result.last_name || prev.lastName,
+                    firstName: result.first_name || prev.firstName,
                     department: prev.department, // プロンプトで未取得のためそのまま
                     zipCode: prev.zipCode, // プロンプトで未取得のためそのまま
                     address: prev.address, // プロンプトで未取得のためそのまま
@@ -182,8 +186,8 @@ export default function RequestFormPage() {
                 alert('送り先の会社名を入力するか、住所録から選択してください。')
                 return
             }
-            if (!formData.contactName) {
-                alert('送り先の担当者名を入力してください。')
+            if (!formData.lastName || !formData.firstName) {
+                alert('送り先の担当者名（姓・名）を入力してください。')
                 return
             }
             if (!formData.phone) {
@@ -307,7 +311,8 @@ export default function RequestFormPage() {
                                             setFormData(prev => ({
                                                 ...prev,
                                                 companyName: aOpt.label || '',
-                                                contactName: aOpt.contact_name || '',
+                                                lastName: aOpt.last_name || '',
+                                                firstName: aOpt.first_name || '',
                                                 department: aOpt.department || '',
                                                 zipCode: aOpt.postal_code || '',
                                                 address: aOpt.address || '',
@@ -337,11 +342,19 @@ export default function RequestFormPage() {
                                     />
                                 </div>
                                 <div className="space-y-2 col-span-2 sm:col-span-1">
-                                    <Label>担当者名</Label>
+                                    <Label>姓</Label>
                                     <Input
-                                        placeholder="例: 山田 太郎"
-                                        value={formData.contactName}
-                                        onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
+                                        placeholder="例: 山田"
+                                        value={formData.lastName}
+                                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2 col-span-2 sm:col-span-1">
+                                    <Label>名</Label>
+                                    <Input
+                                        placeholder="例: 太郎"
+                                        value={formData.firstName}
+                                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                                     />
                                 </div>
                                 <div className="space-y-2 col-span-2 sm:col-span-1">

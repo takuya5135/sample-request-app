@@ -28,7 +28,7 @@ async function verify() {
         if (requests && requests.length > 0) {
             console.log('最新の依頼データ:')
             const latest = requests[0]
-            console.log(`  送付先: ${latest.address_book?.company_name} / ${latest.address_book?.contact_name}`)
+            console.log(`  送付先: ${latest.address_book?.company_name} / ${latest.address_book?.last_name} ${latest.address_book?.first_name}`)
             console.log(`  着日: ${latest.delivery_date} ${latest.delivery_time}`)
             console.log(`  商品詳細: ${JSON.stringify(latest.products)}`)
         }
@@ -46,7 +46,7 @@ async function verify() {
     } else {
         console.log('最近登録された住所 (最大5件):')
         addresses?.forEach(addr => {
-            console.log(`  ${addr.company_name} / ${addr.contact_name} / ${addr.created_at}`)
+            console.log(`  ${addr.company_name} / ${addr.last_name} ${addr.first_name} / ${addr.created_at}`)
         })
     }
 }

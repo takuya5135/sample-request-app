@@ -13,7 +13,8 @@ export async function parseAddressInfo(text?: string, imageBase64?: string, mime
 抽出項目:
 - company_name: 会社名 (必須。株式会社などは含める)
 - department: 部署名 (なければ空文字)
-- contact_name: 氏名 (必須。姓と名の間はスペース)
+- last_name: 姓 (必須)
+- first_name: 名 (必須)
 - postal_code: 郵便番号 (ハイフンあり。なければ空文字)
 - address_: 住所 (都道府県から。なければ空文字)
 - phone: 電話番号 (ハイフンあり。なければ空文字)
@@ -23,7 +24,8 @@ export async function parseAddressInfo(text?: string, imageBase64?: string, mime
 {
   "company_name": "...",
   "department": "...",
-  "contact_name": "...",
+  "last_name": "...",
+  "first_name": "...",
   "postal_code": "...",
   "address_": "...",
   "phone": "...",

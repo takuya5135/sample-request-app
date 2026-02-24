@@ -44,7 +44,8 @@ async function seed() {
             department: '営業部',
             postal_code: '100-0001',
             address: '東京都千代田区千代田1-1-1',
-            contact_name: 'テスト 太郎',
+            last_name: 'テスト',
+            first_name: '太郎',
             phone: '03-1234-5678',
             email: 'test@example.com'
         },
@@ -53,7 +54,8 @@ async function seed() {
             department: '仕入課',
             postal_code: '530-0001',
             address: '大阪府大阪市北区梅田1',
-            contact_name: '大阪 次郎',
+            last_name: '大阪',
+            first_name: '次郎',
             phone: '06-1111-2222',
             email: 'osaka@example.com'
         }

@@ -61,7 +61,7 @@ export default async function AddressBookPage() {
                                         <TableRow key={address.id}>
                                             <TableCell className="font-medium">{address.company_name}</TableCell>
                                             <TableCell>{address.department}</TableCell>
-                                            <TableCell>{address.contact_name}</TableCell>
+                                            <TableCell>{address.last_name} {address.first_name}</TableCell>
                                             <TableCell>{address.phone}</TableCell>
                                             <TableCell className="text-right flex items-center justify-end gap-1">
                                                 <DuplicateAddressDialog address={address} />

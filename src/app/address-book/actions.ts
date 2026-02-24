@@ -36,7 +36,8 @@ export async function updateAddress(id: string, data: any) {
         .from('address_book')
         .update({
             company_name: data.company_name,
-            contact_name: data.contact_name,
+            last_name: data.last_name,
+            first_name: data.first_name,
             department: data.department,
             postal_code: data.postal_code,
             address: data.address,
@@ -66,7 +67,8 @@ export async function createAddress(data: any) {
         .from('address_book')
         .insert({
             company_name: data.company_name,
-            contact_name: data.contact_name,
+            last_name: data.last_name,
+            first_name: data.first_name,
             department: data.department,
             postal_code: data.postal_code,
             address: data.address,

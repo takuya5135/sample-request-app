@@ -21,7 +21,8 @@ interface EditAddressDialogProps {
         department: string
         postal_code: string
         address: string
-        contact_name: string
+        last_name: string
+        first_name: string
         email: string
         phone: string
     }
@@ -35,7 +36,8 @@ export function EditAddressDialog({ address }: EditAddressDialogProps) {
         department: address.department || '',
         postal_code: address.postal_code || '',
         address_: address.address || '',
-        contact_name: address.contact_name || '',
+        last_name: address.last_name || '',
+        first_name: address.first_name || '',
         email: address.email || '',
         phone: address.phone || ''
     })
@@ -44,8 +46,8 @@ export function EditAddressDialog({ address }: EditAddressDialogProps) {
         e.preventDefault()
 
         // 必須チェック
-        if (!formData.company_name || !formData.contact_name || !formData.phone) {
-            alert('会社名、氏名、電話番号は必須です。')
+        if (!formData.company_name || !formData.last_name || !formData.first_name || !formData.phone) {
+            alert('会社名、氏名（姓・名）、電話番号は必須です。')
             return
         }
 
@@ -101,11 +103,21 @@ export function EditAddressDialog({ address }: EditAddressDialogProps) {
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="name" className="text-right text-xs">氏名</Label>
+                            <Label htmlFor="lastName" className="text-right text-xs">姓<span className="text-red-500 ml-1">*</span></Label>
                             <Input
-                                id="name"
-                                value={formData.contact_name}
-                                onChange={(e) => setFormData(prev => ({ ...prev, contact_name: e.target.value }))}
+                                id="lastName"
+                                value={formData.last_name}
+                                onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
+                                className="col-span-3"
+                                required
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="firstName" className="text-right text-xs">名<span className="text-red-500 ml-1">*</span></Label>
+                            <Input
+                                id="firstName"
+                                value={formData.first_name}
+                                onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
                                 className="col-span-3"
                                 required
                             />

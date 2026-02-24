@@ -24,7 +24,8 @@ export async function createShippingRequest(formData: any) {
             .from('address_book')
             .insert({
                 company_name: formData.companyName,
-                contact_name: formData.contactName,
+                last_name: formData.lastName,
+                first_name: formData.firstName,
                 department: formData.department,
                 postal_code: formData.zipCode,
                 address: formData.address,
