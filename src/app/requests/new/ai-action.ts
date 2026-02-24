@@ -22,7 +22,7 @@ ${JSON.stringify(products.map(p => ({ id: p.id, md_code: p.md_code, product_name
 
 出力形式（JSON）:
 {
-  "address_id": "マッチした住所データのID（不明な場合は null）",
+  "address_id": "マッチした住所データのID（完全一致でなくても、会社名の一部や担当者名から推測して最も確からしい既存データのIDを積極的に返してください。全くの新規と明らかな場合のみ null）",
   "company_name": "抽出された会社名（不明な場合は null）",
   "contact_name": "抽出された担当者名（不明な場合は null）",
   "phone": "抽出された電話番号（ハイフンあり。不明な場合は null）",
