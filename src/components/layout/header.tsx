@@ -1,18 +1,19 @@
 import { signout } from '@/app/login/actions'
 import { Button } from '@/components/ui/button'
 import { ProfileDialog } from './profile-dialog'
+import Link from 'next/link'
 
 export function Header({ profile }: { profile?: any }) {
     return (
         <header className="bg-white border-b sticky top-0 z-10">
             <div className="flex h-16 items-center justify-between px-4 max-w-5xl mx-auto w-full">
-                <div className="font-semibold text-lg flex items-center gap-2">
+                <Link href="/" className="font-semibold text-lg flex items-center gap-2 hover:opacity-80 transition-opacity">
                     {/* Simple Logo Placeholder */}
                     <div className="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center text-white font-bold">
                         S
                     </div>
                     サンプル依頼支援アプリ
-                </div>
+                </Link>
 
                 {profile?.email && (
                     <div className="flex items-center gap-2 sm:gap-4">

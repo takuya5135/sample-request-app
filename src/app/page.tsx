@@ -34,12 +34,17 @@ export default async function Home() {
     }
   }
 
-  // 発送依頼データと住所録を結合して取得
-  const { data: shippingData } = await supabase
-    .from('shipping_data')
-    .select('*, address_book(*)')
-    .order('created_at', { ascending: false })
-    .limit(50)
+  // 発送依頼データと住所録を結合してユーザー自身のデータのみ取得
+  let shippingData: any[] | null = null;
+  if (user) {
+    const { data } = await supabase
+      .from('shipping_data')
+      .select('*, address_book(*)')
+      .eq('created_by', user.id)
+      .order('created_at', { ascending: false })
+      .limit(50)
+    shippingData = data
+  }
 
   // 全商品をフェッチしてルックアップマップを作成 (件数が少ない想定)
   const { data: products } = await supabase.from('products').select('*')
