@@ -14,8 +14,17 @@ export default async function AddressBookPage() {
 
     let userProfile: any = null
     if (user) {
-        const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-        userProfile = profile || { email: user.email }
+        const { data: profileData } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+        if (profileData) {
+            userProfile = {
+                id: profileData.id,
+                email: profileData.email || user.email,
+                company_name: profileData.company_name || '',
+                last_name: profileData.last_name || ''
+            }
+        } else {
+            userProfile = { email: user.email }
+        }
     }
 
     // 住所録データの取得（削除済みのものは除外）

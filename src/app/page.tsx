@@ -16,38 +16,47 @@ export default async function Home() {
 
   if (user) {
     const { data: profileData } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-    userProfile = profileData || { email: user.email }
+    if (profileData) {
+      userProfile = {
+        id: profileData.id,
+        email: profileData.email || user.email,
+        company_name: profileData.company_name || '',
+        last_name: profileData.last_name || ''
+      }
+    } else {
+      userProfile = { email: user.email }
+    }
+  }
 
-    // 発送依頼データと住所録を結合して取得
-    const { data: shippingData } = await supabase
-      .from('shipping_data')
-      .select('*, address_book(*)')
-      .order('created_at', { ascending: false })
-      .limit(50)
+  // 発送依頼データと住所録を結合して取得
+  const { data: shippingData } = await supabase
+    .from('shipping_data')
+    .select('*, address_book(*)')
+    .order('created_at', { ascending: false })
+    .limit(50)
 
-    // 全商品をフェッチしてルックアップマップを作成 (件数が少ない想定)
-    const { data: products } = await supabase.from('products').select('*')
-    const productMap = new Map<string, any>((products || []).map((p: any) => [p.id, p]))
+  // 全商品をフェッチしてルックアップマップを作成 (件数が少ない想定)
+  const { data: products } = await supabase.from('products').select('*')
+  const productMap = new Map<string, any>((products || []).map((p: any) => [p.id, p]))
 
-    if (shippingData) {
-      mappedRequests = shippingData.map((req: any) => {
-        // req.products is an array of { product_id, quantity }
-        const parsedItems = typeof req.products === 'string' ? JSON.parse(req.products) : req.products
-        const mappedProducts = (parsedItems || []).map((item: any) => {
-          const productDetail = productMap.get(item.product_id) as any
-          return {
-            mdCode: productDetail?.md_code || '',
-            productName: productDetail?.product_name || '不明な商品',
-            quantity: item.quantity
-          }
-        })
-
+  if (shippingData) {
+    mappedRequests = shippingData.map((req: any) => {
+      // req.products is an array of { product_id, quantity }
+      const parsedItems = typeof req.products === 'string' ? JSON.parse(req.products) : req.products
+      const mappedProducts = (parsedItems || []).map((item: any) => {
+        const productDetail = productMap.get(item.product_id) as any
         return {
-          ...req,
-          mappedProducts
+          mdCode: productDetail?.md_code || '',
+          productName: productDetail?.product_name || '不明な商品',
+          quantity: item.quantity
         }
       })
-    }
+
+      return {
+        ...req,
+        mappedProducts
+      }
+    })
   }
 
   return (

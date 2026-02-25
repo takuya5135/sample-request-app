@@ -59,7 +59,16 @@ export default function RequestFormPage() {
             const { data: { user } } = await supabase.auth.getUser()
             if (user) {
                 const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-                setUserProfile(profile || { email: user.email })
+                if (profile) {
+                    setUserProfile({
+                        id: profile.id,
+                        email: profile.email || user.email,
+                        company_name: profile.company_name || '',
+                        last_name: profile.last_name || ''
+                    })
+                } else {
+                    setUserProfile({ email: user.email })
+                }
             }
 
             // 住所録取得

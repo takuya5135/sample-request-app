@@ -17,7 +17,17 @@ export default async function ProductsPage() {
     let userProfile: any = null
     if (user) {
         const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-        userProfile = profile || { email: user.email }
+        if (profile) {
+            userProfile = {
+                id: profile.id,
+                email: profile.email || user.email,
+                company_name: profile.company_name || '',
+                last_name: profile.last_name || '',
+                role: profile.role || 'user'
+            }
+        } else {
+            userProfile = { email: user.email }
+        }
     }
 
     // Role check for products
