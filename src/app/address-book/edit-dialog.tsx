@@ -13,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { updateAddress } from './actions'
+import { fetchAddressByZipcode } from '@/lib/zipcode'
 
 interface EditAddressDialogProps {
     address: {
@@ -128,7 +129,17 @@ export function EditAddressDialog({ address }: EditAddressDialogProps) {
                             <Input
                                 id="zip"
                                 value={formData.postal_code}
-                                onChange={(e) => setFormData(prev => ({ ...prev, postal_code: e.target.value }))}
+                                onChange={async (e) => {
+                                    const val = e.target.value;
+                                    setFormData(prev => ({ ...prev, postal_code: val }));
+                                    const clean = val.replace(/[^0-9]/g, '');
+                                    if (clean.length === 7) {
+                                        const address = await fetchAddressByZipcode(clean);
+                                        if (address) {
+                                            setFormData(prev => ({ ...prev, address_: address }));
+                                        }
+                                    }
+                                }}
                                 className="col-span-3"
                             />
                         </div>

@@ -14,6 +14,7 @@ import { Autocomplete, AutocompleteOption } from '@/components/ui/autocomplete'
 import { parseShippingRequest } from './ai-action'
 import { createShippingRequest } from './submit-action'
 import { createClient } from '@/lib/supabase/client'
+import { fetchAddressByZipcode } from '@/lib/zipcode'
 
 export const dynamic = 'force-dynamic'
 
@@ -374,7 +375,17 @@ export default function RequestFormPage() {
                                     <Input
                                         placeholder="例: 123-4567"
                                         value={formData.zipCode}
-                                        onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
+                                        onChange={async (e) => {
+                                            const val = e.target.value;
+                                            setFormData(prev => ({ ...prev, zipCode: val }));
+                                            const clean = val.replace(/[^0-9]/g, '');
+                                            if (clean.length === 7) {
+                                                const address = await fetchAddressByZipcode(clean);
+                                                if (address) {
+                                                    setFormData(prev => ({ ...prev, address: address }));
+                                                }
+                                            }
+                                        }}
                                     />
                                 </div>
                                 <div className="space-y-2 col-span-2">
