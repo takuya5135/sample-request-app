@@ -25,6 +25,12 @@ export default function RequestFormPage() {
     const [isPending, startTransition] = useTransition()
     const [isSubmitting, setIsSubmitting] = useState(false) // 二度押し防止用ステート
 
+    const getDefaultDeliveryDate = () => {
+        const d = new Date()
+        d.setDate(d.getDate() + 2)
+        return d.toISOString().split('T')[0]
+    }
+
     const [formData, setFormData] = useState({
         companyName: '',
         lastName: '',
@@ -33,7 +39,7 @@ export default function RequestFormPage() {
         zipCode: '',
         address: '',
         phone: '',
-        deliveryDate: '',
+        deliveryDate: getDefaultDeliveryDate(),
         deliveryTime: 'am',
         saveToAddressBook: false // 住所録へ保存するかどうか
     })

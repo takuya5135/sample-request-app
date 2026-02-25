@@ -7,8 +7,17 @@ const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY });
 
 export async function parseShippingRequest(input: string, addresses: any[], products: any[]) {
   try {
+    // 日本時間での現在日付の取得
+    const today = new Date();
+    const jstDate = new Date(today.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+    const yyyy = jstDate.getFullYear();
+    const mm = String(jstDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(jstDate.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+
     const prompt = `
 あなたは有能なデータ入力アシスタントです。
+現在のシステム日付は【${todayStr}】です。
 ユーザーが入力した「サンプルの依頼内容（自然言語）」から必要な情報を抽出し、渡された【住所録データ】および【商品リストデータ】のレコードと正確にマッピング（紐付け）を行ってください。
 
 【最も重要なミッション】
@@ -37,7 +46,7 @@ ${JSON.stringify(products.map(p => ({ id: p.id, md_code: p.md_code, product_name
       "quantity": 数量（数値で。不明な場合は1）
     }
   ],
-  "delivery_date": "YYYY-MM-DD形式。例：明後日なら現在日から計算",
+  "delivery_date": "YYYY-MM-DD形式。ユーザーが日付（例：明後日、来週の水曜など）を指定している場合のみ、現在の日付（${todayStr}）から計算して出力してください。指定がない・不明な場合は必ず null を出力してください。",
   "delivery_time": "am" | "14-16" | "16-18" | "18-20" | "19-21" のいずれか（不明なら "am"）
 }
 ※JSONブロックのみを出力し、マークダウンの装飾記号などは除外してください。
