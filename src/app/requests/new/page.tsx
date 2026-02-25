@@ -186,8 +186,8 @@ export default function RequestFormPage() {
                 alert('送り先の会社名を入力するか、住所録から選択してください。')
                 return
             }
-            if (!formData.lastName || !formData.firstName) {
-                alert('送り先の担当者名（姓・名）を入力してください。')
+            if (!formData.lastName) {
+                alert('送り先の担当者名（姓）を入力してください。')
                 return
             }
             if (!formData.phone) {
@@ -342,11 +342,12 @@ export default function RequestFormPage() {
                                     />
                                 </div>
                                 <div className="space-y-2 col-span-2 sm:col-span-1">
-                                    <Label>姓</Label>
+                                    <Label>姓 <span className="text-red-500">*</span></Label>
                                     <Input
                                         placeholder="例: 山田"
                                         value={formData.lastName}
                                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                                        required={!selectedAddress}
                                     />
                                 </div>
                                 <div className="space-y-2 col-span-2 sm:col-span-1">

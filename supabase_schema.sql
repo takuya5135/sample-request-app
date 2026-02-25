@@ -23,7 +23,7 @@ create table public.address_book (
   postal_code text,
   address text,
   last_name text not null,
-  first_name text not null,
+  first_name text,
   email text,
   phone text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,

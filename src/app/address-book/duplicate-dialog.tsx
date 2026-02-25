@@ -47,8 +47,8 @@ export function DuplicateAddressDialog({ address }: DuplicateAddressDialogProps)
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        if (!formData.company_name || !formData.last_name || !formData.first_name || !formData.phone) {
-            alert('会社名、氏名（姓・名）、電話番号は必須です。')
+        if (!formData.company_name || !formData.last_name || !formData.phone) {
+            alert('会社名、姓、電話番号は必須です。')
             return
         }
 
@@ -129,13 +129,12 @@ export function DuplicateAddressDialog({ address }: DuplicateAddressDialogProps)
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="dup-firstName" className="text-right text-xs">名<span className="text-red-500 ml-1">*</span></Label>
+                            <Label htmlFor="dup-firstName" className="text-right text-xs">名</Label>
                             <Input
                                 id="dup-firstName"
                                 value={formData.first_name}
                                 onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
                                 className="col-span-3"
-                                required
                             />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
