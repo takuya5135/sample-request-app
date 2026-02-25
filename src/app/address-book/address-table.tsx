@@ -78,36 +78,68 @@ export function AddressTable({ initialAddresses }: { initialAddresses: Address[]
                     {searchQuery ? '検索条件に一致する住所データが見つかりません。' : '登録されている住所データがありません。'}
                 </div>
             ) : (
-                <div className="rounded-md border bg-white overflow-hidden">
-                    <Table>
-                        <TableHeader>
-                            <TableRow className="bg-gray-50">
-                                <TableHead className="w-[30%] font-semibold">会社名</TableHead>
-                                <TableHead className="w-[20%] font-semibold">部署名</TableHead>
-                                <TableHead className="w-[20%] font-semibold">氏名</TableHead>
-                                <TableHead className="w-[20%] font-semibold">電話番号</TableHead>
-                                <TableHead className="w-[10%] text-right font-semibold">操作</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {filteredAddresses.map((address) => (
-                                <TableRow key={address.id} className="hover:bg-gray-50/50">
-                                    <TableCell className="font-medium text-gray-900">{address.company_name}</TableCell>
-                                    <TableCell className="text-gray-600">{address.department}</TableCell>
-                                    <TableCell className="text-gray-900">{address.last_name} {address.first_name}</TableCell>
-                                    <TableCell className="text-gray-600 font-mono text-sm">{address.phone}</TableCell>
-                                    <TableCell className="text-right">
-                                        <div className="flex items-center justify-end gap-1">
-                                            <DuplicateAddressDialog address={address as any} />
-                                            <EditAddressDialog address={address as any} />
-                                            <DeleteAddressButton id={address.id} />
-                                        </div>
-                                    </TableCell>
+                <>
+                    {/* デスクトップ用テーブル表示 */}
+                    <div className="hidden md:block rounded-md border bg-white overflow-hidden shadow-sm">
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="bg-gray-50">
+                                    <TableHead className="w-[30%] font-semibold">会社名</TableHead>
+                                    <TableHead className="w-[20%] font-semibold">部署名</TableHead>
+                                    <TableHead className="w-[20%] font-semibold">氏名</TableHead>
+                                    <TableHead className="w-[20%] font-semibold">電話番号</TableHead>
+                                    <TableHead className="w-[10%] text-right font-semibold">操作</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </div>
+                            </TableHeader>
+                            <TableBody>
+                                {filteredAddresses.map((address) => (
+                                    <TableRow key={address.id} className="hover:bg-gray-50/50">
+                                        <TableCell className="font-medium text-gray-900">{address.company_name}</TableCell>
+                                        <TableCell className="text-gray-600">{address.department}</TableCell>
+                                        <TableCell className="text-gray-900">{address.last_name} {address.first_name}</TableCell>
+                                        <TableCell className="text-gray-600 font-mono text-sm">{address.phone}</TableCell>
+                                        <TableCell className="text-right">
+                                            <div className="flex items-center justify-end gap-1">
+                                                <DuplicateAddressDialog address={address as any} />
+                                                <EditAddressDialog address={address as any} />
+                                                <DeleteAddressButton id={address.id} />
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+
+                    {/* スマホ用カードリスト表示 */}
+                    <div className="md:hidden space-y-3">
+                        {filteredAddresses.map((address) => (
+                            <div key={address.id} className="bg-white border rounded-lg p-4 shadow-sm flex flex-col gap-2">
+                                <div className="flex justify-between items-start gap-2">
+                                    <div>
+                                        <h3 className="font-bold text-gray-900 leading-tight">{address.company_name}</h3>
+                                        {address.department && <p className="text-sm text-gray-600 mt-1">{address.department}</p>}
+                                    </div>
+                                    <div className="flex items-center gap-1 shrink-0">
+                                        <DuplicateAddressDialog address={address as any} />
+                                        <EditAddressDialog address={address as any} />
+                                        <DeleteAddressButton id={address.id} />
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-1 mt-2 text-sm">
+                                    <div className="flex items-center">
+                                        <span className="text-gray-500 w-16 shrink-0">担当者:</span>
+                                        <span className="text-gray-900 font-medium">{address.last_name} {address.first_name}</span>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <span className="text-gray-500 w-16 shrink-0">TEL:</span>
+                                        <span className="text-gray-600 font-mono">{address.phone}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </>
             )}
 
             <div className="flex justify-between items-center text-sm text-gray-500 pt-2">
