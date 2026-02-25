@@ -31,12 +31,12 @@ export function generateInternalRequestEmail(data: EmailRequestData) {
 以下の通り、サンプルの手配をお願いいたします。
 
 【お届け先】
-企業名: ${data.companyName}
-部署名: ${data.department || ''}
-担当者: ${data.lastName} ${data.firstName || ''} 様
-郵便番号: ${data.postalCode || ''}
-住所: ${data.address || ''}
-電話番号: ${data.phone || ''}
+${data.companyName}
+${data.department || ''}
+${data.lastName} ${data.firstName || ''} 様
+〒${data.postalCode || ''}
+${data.address || ''}
+${data.phone || ''}
 
 【着日指定】
 ${formattedDate}  ${data.deliveryTime}
@@ -112,7 +112,7 @@ ${data.lastName}様
 ${productList}
 
 調理方法や歩留まり、その他ご不明な点がございましたら、いつでもサポートさせていただきます。
-ご検討のほど、何卒よろしくお願い申し上げます。
+引き続きご検討のほど、何卒よろしくお願い申し上げます。
 
 --------------------------------------------------
 ${data.userCompanyName}
