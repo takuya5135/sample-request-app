@@ -63,9 +63,11 @@ export function DuplicateAddressDialog({ address }: DuplicateAddressDialogProps)
                 if (result.success) {
                     alert('複製して新規登録しました。')
                     setOpen(false)
+                } else {
+                    alert(result.error)
                 }
             } catch (err: any) {
-                alert(err.message)
+                alert('予期せぬエラーが発生しました')
             }
         })
     }

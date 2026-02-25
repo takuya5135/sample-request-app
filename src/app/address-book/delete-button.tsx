@@ -19,9 +19,11 @@ export function DeleteAddressButton({ id }: { id: string }) {
                 const result = await deleteAddress(id)
                 if (result.success) {
                     alert('削除しました。')
+                } else {
+                    alert(result.error)
                 }
             } catch (err: any) {
-                alert(err.message)
+                alert('予期せぬエラーが発生しました')
             } finally {
                 setIsDeleting(false)
             }

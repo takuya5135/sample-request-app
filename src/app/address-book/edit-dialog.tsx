@@ -62,9 +62,11 @@ export function EditAddressDialog({ address }: EditAddressDialogProps) {
                 if (result.success) {
                     alert('住所データを更新しました。')
                     setOpen(false) // ダイアログを閉じる
+                } else {
+                    alert(result.error)
                 }
             } catch (err: any) {
-                alert(err.message)
+                alert('予期せぬエラーが発生しました')
             }
         })
     }

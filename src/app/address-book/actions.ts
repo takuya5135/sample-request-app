@@ -9,7 +9,7 @@ export async function deleteAddress(id: string) {
     // セッションチェック
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
-        throw new Error('ログインが必要です')
+        return { success: false, error: 'ログインが必要です' }
     }
 
     const { error } = await supabase
@@ -19,7 +19,7 @@ export async function deleteAddress(id: string) {
 
     if (error) {
         console.error('Soft Delete Address Error:', error)
-        throw new Error('住所の削除に失敗しました')
+        return { success: false, error: '住所の削除に失敗しました' }
     }
 
     revalidatePath('/address-book')
@@ -30,7 +30,7 @@ export async function updateAddress(id: string, data: any) {
     const supabase = (await createClient()) as any
 
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('ログインが必要です')
+    if (!user) return { success: false, error: 'ログインが必要です' }
 
     const { error } = await supabase
         .from('address_book')
@@ -48,7 +48,7 @@ export async function updateAddress(id: string, data: any) {
 
     if (error) {
         console.error('Update Address Error:', error)
-        throw new Error('住所の更新に失敗しました')
+        return { success: false, error: '住所の更新に失敗しました: ' + error.message }
     }
 
     revalidatePath('/address-book')
@@ -60,7 +60,7 @@ export async function createAddress(data: any) {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-        throw new Error('ログインが必要です')
+        return { success: false, error: 'ログインが必要です' }
     }
 
     const { error } = await supabase
@@ -79,7 +79,7 @@ export async function createAddress(data: any) {
 
     if (error) {
         console.error('Create Address Error:', error)
-        throw new Error('住所の登録に失敗しました')
+        return { success: false, error: '住所の登録に失敗しました: ' + error.message }
     }
 
     revalidatePath('/address-book')

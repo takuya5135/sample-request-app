@@ -97,16 +97,18 @@ export function CreateAddressDialog() {
                 })
 
                 if (result.success) {
-                    alert('住所データを登録しました。')
-                    setOpen(false)
+                    alert('新しい住所データを登録しました。')
+                    setOpen(false) // ダイアログを閉じる
                     // フォームリセット
                     setFormData({
                         company_name: '', department: '', postal_code: '',
                         address_: '', last_name: '', first_name: '', email: '', phone: ''
                     })
+                } else {
+                    alert(result.error)
                 }
             } catch (err: any) {
-                alert(err.message)
+                alert('予期せぬエラーが発生しました')
             }
         })
     }
