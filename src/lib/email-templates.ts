@@ -97,8 +97,14 @@ export function generateCustomerFollowupEmail(data: EmailRequestData) {
     const subject = `【ご確認】先日お送りしたサンプルの件につきまして`
 
     const productList = data.products
-        .map(p => `・${p.productName} ${p.specification || ''}`)
+        .map(p => `・${p.productName}`)
         .join('\n')
+
+    // 日付を「〇月〇日」形式に変換
+    const dateObj = new Date(data.deliveryDate)
+    const formattedDate = !isNaN(dateObj.getTime())
+        ? `${dateObj.getMonth() + 1}月${dateObj.getDate()}日`
+        : data.deliveryDate
 
     const body = `${data.companyName}
 ${data.lastName}様
@@ -107,6 +113,9 @@ ${data.lastName}様
 
 先日お送りいたしましたサンプルにつきまして、その後いかがでしたでしょうか。
 もしよろしければ、社内でのご評価やご意見などをお聞かせいただけますと幸いです。
+
+【お届けした日】
+${formattedDate}
 
 【お送りした商品】
 ${productList}
