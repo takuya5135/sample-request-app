@@ -103,18 +103,40 @@ export default function RequestFormPage() {
         e.preventDefault()
         startTransition(async () => {
             try {
-                const result = await parseShippingRequest(aiInput, [], []) // DBデータは一旦空配列でテスト
+                const addressDataForAi = addressOptions.map(opt => ({
+                    id: opt.value,
+                    company_name: opt.label,
+                    department: (opt as any).department,
+                    last_name: (opt as any).last_name,
+                    first_name: (opt as any).first_name,
+                    phone: (opt as any).phone
+                }));
+                const productDataForAi = productOptions.map(opt => ({
+                    id: opt.value,
+                    product_name: opt.label,
+                    md_code: (opt as any).description
+                }));
+                const result = await parseShippingRequest(aiInput, addressDataForAi, productDataForAi);
 
                 // alert('解析結果:\n' + JSON.stringify(result, null, 2))
 
-                // AI結果の反映
+                // AI結果の反映 (商品リストの更新)
+                if (result.products && Array.isArray(result.products) && result.products.length > 0) {
+                    const mappedProducts = result.products.map((p: any, idx: number) => ({
+                        id: Date.now() + idx,
+                        productId: p.product_id ? String(p.product_id) : '',
+                        quantity: typeof p.quantity === 'number' ? p.quantity : 1
+                    }));
+                    setSelectedProducts(mappedProducts);
+                }
+
                 let targetId = result.address_id ? String(result.address_id) : null;
 
                 // 【最重要】AIがIDを見つけられずテキストだけ返してきた場合の、フロントエンド側での強力な自力マッピング（部分一致検索）
                 if (!targetId && result.company_name) {
                     console.log("AI couldn't find ID. Executing frontend fallback text search...");
                     const safeCompany = result.company_name.toLowerCase();
-                    const safeContact = result.contact_name ? result.contact_name.toLowerCase() : '';
+                    const safeContact = `${result.last_name || ''} ${result.first_name || ''}`.trim().toLowerCase();
 
                     const fallbackMatch = addressOptions.find(opt => {
                         const optLabel = opt.label.toLowerCase(); // 会社名
@@ -158,18 +180,19 @@ export default function RequestFormPage() {
                 }
 
                 // 完全に一致しなかった（新規）場合
-                console.log("No match found. Appling as new entry.");
+                console.log("No match found. Applying as new entry.");
+                setSelectedAddress('');
 
-                // マッチしなかった場合はAIのテキスト解析結果だけを各項目に反映する
+                // マッチしなかった場合は古い情報をクリアし、AIのテキスト解析結果だけを各項目に反映する
                 setFormData(prev => ({
                     ...prev,
-                    companyName: result.company_name || prev.companyName,
-                    lastName: result.last_name || prev.lastName,
-                    firstName: result.first_name || prev.firstName,
-                    department: prev.department, // プロンプトで未取得のためそのまま
-                    zipCode: prev.zipCode, // プロンプトで未取得のためそのまま
-                    address: prev.address, // プロンプトで未取得のためそのまま
-                    phone: result.phone || prev.phone,
+                    companyName: result.company_name || '',
+                    lastName: result.last_name || '',
+                    firstName: result.first_name || '',
+                    department: '',
+                    zipCode: '',
+                    address: '',
+                    phone: result.phone || '',
                     deliveryDate: result.delivery_date || prev.deliveryDate,
                     deliveryTime: result.delivery_time || prev.deliveryTime
                 }))
