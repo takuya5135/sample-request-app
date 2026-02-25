@@ -3,10 +3,48 @@ import { Header } from '@/components/layout/header'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { RequestList } from './request-list'
+
+export const dynamic = 'force-dynamic'
 
 export default async function Home() {
   const supabase = (await createClient()) as any
   const { data: { user } } = await supabase.auth.getUser()
+
+  let mappedRequests: any[] = []
+
+  if (user) {
+    // 発送依頼データと住所録を結合して取得
+    const { data: shippingData } = await supabase
+      .from('shipping_data')
+      .select('*, address_book(*)')
+      .order('created_at', { ascending: false })
+      .limit(50)
+
+    // 全商品をフェッチしてルックアップマップを作成 (件数が少ない想定)
+    const { data: products } = await supabase.from('products').select('*')
+    const productMap = new Map<string, any>((products || []).map((p: any) => [p.id, p]))
+
+    if (shippingData) {
+      mappedRequests = shippingData.map((req: any) => {
+        // req.products is an array of { product_id, quantity }
+        const parsedItems = typeof req.products === 'string' ? JSON.parse(req.products) : req.products
+        const mappedProducts = (parsedItems || []).map((item: any) => {
+          const productDetail = productMap.get(item.product_id) as any
+          return {
+            mdCode: productDetail?.md_code || '',
+            productName: productDetail?.product_name || '不明な商品',
+            quantity: item.quantity
+          }
+        })
+
+        return {
+          ...req,
+          mappedProducts
+        }
+      })
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -58,6 +96,13 @@ export default async function Home() {
             </CardContent>
           </Card>
         </div>
+
+        {user && (
+          <RequestList
+            requests={mappedRequests}
+            currentUserEmail={user.email || 'user@example.com'}
+          />
+        )}
       </main>
     </div>
   )
