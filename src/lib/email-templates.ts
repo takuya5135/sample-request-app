@@ -131,6 +131,10 @@ ${data.userLastName}
     return { subject, body }
 }
 
-export function createMailtoLink(to: string, subject: string, body: string) {
-    return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+export function createMailtoLink(to: string, subject: string, body: string, bcc?: string) {
+    let link = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    if (bcc) {
+        link += `&bcc=${encodeURIComponent(bcc)}`
+    }
+    return link
 }

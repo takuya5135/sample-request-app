@@ -10,6 +10,10 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-    // 基本的にネットワークリクエストをそのまま通す（PWAインストールのためのダミーfetchハンドラ）
-    return;
+    // ネットワークリクエストを処理（PWAのインストール要件として必須）
+    event.respondWith(
+        fetch(event.request).catch(() => {
+            // オフライン時のフォールバック処理が必要な場合はここに記述
+        })
+    );
 });

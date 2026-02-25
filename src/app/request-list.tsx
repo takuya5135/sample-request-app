@@ -64,7 +64,7 @@ export function RequestList({ requests, currentUserEmail, userProfile }: Request
             to = req.address_book?.email || ""
         }
 
-        const mailtoUrl = createMailtoLink(to, subject, body)
+        const mailtoUrl = createMailtoLink(to, subject, body, currentUserEmail)
         window.location.href = mailtoUrl
     }
 
