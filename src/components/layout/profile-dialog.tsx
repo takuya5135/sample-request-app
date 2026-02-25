@@ -20,11 +20,15 @@ export function ProfileDialog({ profile }: { profile: any }) {
         setIsLoading(true)
 
         try {
-            await updateProfile({ companyName, lastName })
-            setOpen(false)
-            alert('プロフィールを更新しました')
+            const result = await updateProfile({ companyName, lastName })
+            if (result.success) {
+                setOpen(false)
+                alert('プロフィールを更新しました')
+            } else {
+                setError(result.error || '不明なエラーが発生しました')
+            }
         } catch (err: any) {
-            setError(err.message || '更新に失敗しました')
+            setError(err.message || '通信エラー等が発生しました')
         } finally {
             setIsLoading(false)
         }

@@ -8,7 +8,7 @@ export async function updateProfile(formData: { companyName: string, lastName: s
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-        throw new Error('ログインが必要です')
+        return { success: false, error: 'ログインが必要です' }
     }
 
     const { error } = await supabase
@@ -21,7 +21,7 @@ export async function updateProfile(formData: { companyName: string, lastName: s
 
     if (error) {
         console.error('Update Profile Error:', error)
-        throw new Error('プロフィールの更新に失敗しました')
+        return { success: false, error: `データベースエラー: ${error.message || '更新に失敗しました'}` }
     }
 
     // 更新後に画面全体に変更を反映
