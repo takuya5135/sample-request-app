@@ -466,7 +466,7 @@ export default function RequestFormPage() {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {selectedProducts.map((p, index) => (
-                                <div key={p.id} className="flex gap-2 items-end">
+                                <div key={p.id} className="flex flex-col sm:flex-row gap-3 sm:gap-2 sm:items-end border-b border-gray-100 sm:border-0 pb-4 sm:pb-0 pt-2 sm:pt-0">
                                     <div className="space-y-2 flex-grow">
                                         <Label>商品</Label>
                                         <Autocomplete
@@ -480,33 +480,35 @@ export default function RequestFormPage() {
                                             placeholder="商品名や規格で検索（文字を入力すると候補が出ます）..."
                                         />
                                     </div>
-                                    <div className="space-y-2 w-24 flex-shrink-0">
-                                        <Label>数量</Label>
-                                        <Select
-                                            value={p.quantity.toString()}
-                                            onChange={(e) => {
-                                                const newArray = [...selectedProducts]
-                                                newArray[index].quantity = parseInt(e.target.value)
-                                                setSelectedProducts(newArray)
+                                    <div className="flex gap-2 items-end">
+                                        <div className="space-y-2 w-24 flex-shrink-0">
+                                            <Label>数量</Label>
+                                            <Select
+                                                value={p.quantity.toString()}
+                                                onChange={(e) => {
+                                                    const newArray = [...selectedProducts]
+                                                    newArray[index].quantity = parseInt(e.target.value)
+                                                    setSelectedProducts(newArray)
+                                                }}
+                                            >
+                                                {[...Array(15)].map((_, i) => (
+                                                    <option key={i + 1} value={i + 1}>{i + 1}</option>
+                                                ))}
+                                            </Select>
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            className="mb-px bg-gray-50 text-red-500 hover:bg-red-50"
+                                            onClick={() => {
+                                                if (selectedProducts.length > 1) {
+                                                    setSelectedProducts(selectedProducts.filter((_, i) => i !== index))
+                                                }
                                             }}
                                         >
-                                            {[...Array(15)].map((_, i) => (
-                                                <option key={i + 1} value={i + 1}>{i + 1}</option>
-                                            ))}
-                                        </Select>
+                                            削除
+                                        </Button>
                                     </div>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        className="mb-px bg-gray-50 text-red-500 hover:bg-red-50"
-                                        onClick={() => {
-                                            if (selectedProducts.length > 1) {
-                                                setSelectedProducts(selectedProducts.filter((_, i) => i !== index))
-                                            }
-                                        }}
-                                    >
-                                        削除
-                                    </Button>
                                 </div>
                             ))}
                             <Button
