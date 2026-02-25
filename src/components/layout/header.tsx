@@ -1,6 +1,7 @@
 import { signout } from '@/app/login/actions'
 import { Button } from '@/components/ui/button'
 import { ProfileDialog } from './profile-dialog'
+import { HelpDialog } from './help-dialog'
 import Link from 'next/link'
 
 export function Header({ profile }: { profile?: any }) {
@@ -20,6 +21,7 @@ export function Header({ profile }: { profile?: any }) {
                         <span className="text-sm text-gray-600 hidden sm:inline-block truncate max-w-[200px]">
                             {profile.company_name ? `${profile.company_name} ${profile.last_name}` : profile.email}
                         </span>
+                        <HelpDialog />
                         <ProfileDialog profile={profile} />
                         <form action={signout}>
                             <Button variant="outline" size="sm">ログアウト</Button>

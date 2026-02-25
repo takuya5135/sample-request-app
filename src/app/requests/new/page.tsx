@@ -24,6 +24,7 @@ export default function RequestFormPage() {
     const [aiInput, setAiInput] = useState('')
     const [isPending, startTransition] = useTransition()
     const [isSubmitting, setIsSubmitting] = useState(false) // 二度押し防止用ステート
+    const [isRecording, setIsRecording] = useState(false) // 音声入力中ステート
 
     const getDefaultDeliveryDate = () => {
         const d = new Date()
@@ -109,17 +110,39 @@ export default function RequestFormPage() {
     }, [])
 
     // Speech Recognition (Web Speech API Wrapper)
-    const startVoiceInput = () => {
+    const [recognition, setRecognition] = useState<any>(null)
+
+    const toggleVoiceInput = () => {
         if (!('webkitSpeechRecognition' in window)) {
             alert("お使いのブラウザは音声入力に対応していません。")
             return
         }
-        const recognition = new (window as any).webkitSpeechRecognition()
-        recognition.lang = 'ja-JP'
-        recognition.onresult = (event: any) => {
-            setAiInput((prev) => prev + event.results[0][0].transcript)
+
+        if (isRecording && recognition) {
+            recognition.stop()
+            return
         }
-        recognition.start()
+
+        const newRecognition = new (window as any).webkitSpeechRecognition()
+        newRecognition.lang = 'ja-JP'
+        newRecognition.continuous = true
+        newRecognition.interimResults = false
+
+        newRecognition.onstart = () => {
+            setIsRecording(true)
+        }
+
+        newRecognition.onend = () => {
+            setIsRecording(false)
+        }
+
+        newRecognition.onresult = (event: any) => {
+            const transcript = event.results[event.results.length - 1][0].transcript
+            setAiInput((prev) => prev + transcript)
+        }
+
+        newRecognition.start()
+        setRecognition(newRecognition)
     }
 
     const handleAISubmit = async (e: React.FormEvent) => {
@@ -330,8 +353,22 @@ export default function RequestFormPage() {
                                     onChange={(e: any) => setAiInput(e.target.value)}
                                 />
                                 <div className="flex gap-2 justify-end">
-                                    <Button type="button" variant="outline" className="gap-2" onClick={startVoiceInput}>
-                                        🎤 音声入力
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className={`gap-2 transition-all ${isRecording ? 'border-red-500 bg-red-50' : ''}`}
+                                        onClick={toggleVoiceInput}
+                                    >
+                                        <div className="relative flex items-center justify-center">
+                                            <span className={`text-lg transition-opacity ${isRecording ? 'opacity-50' : 'opacity-100'}`}>🎙️</span>
+                                            {isRecording && (
+                                                <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+                                                </span>
+                                            )}
+                                        </div>
+                                        {isRecording ? '録音を停止' : '音声入力'}
                                     </Button>
                                     <Button type="submit" disabled={isPending} className="bg-indigo-600 hover:bg-indigo-700 text-white">
                                         {isPending ? '解析中...' : '解析してフォームに反映'}
