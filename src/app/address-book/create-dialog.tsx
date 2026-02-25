@@ -178,6 +178,15 @@ export function CreateAddressDialog() {
                                 <Label className="text-xs">または名刺画像をアップロード<span className="text-indigo-500 font-normal ml-2">(Ctrl+Vで直接貼付も可能)</span></Label>
                                 <Input type="file" accept="image/*" onChange={handleImageUpload} className="text-xs" />
                                 {aiImageName && <p className="text-xs text-green-600 truncate mt-1">選択中: {aiImageName}</p>}
+                                {aiImageBase64 && aiMimeType && (
+                                    <div className="mt-2 flex justify-center p-1 bg-white border border-gray-200 rounded-md shadow-sm">
+                                        <img
+                                            src={`data:${aiMimeType};base64,${aiImageBase64}`}
+                                            alt="アップロード画像のプレビュー"
+                                            className="max-h-[140px] w-auto object-contain rounded-sm"
+                                        />
+                                    </div>
+                                )}
                             </div>
                             <Button type="button" className="w-full" disabled={isAiLoading} onClick={handleAiInput}>
                                 {isAiLoading ? '解析中...' : '解析してフォームに入力'}
