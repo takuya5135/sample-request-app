@@ -39,7 +39,7 @@ export function HelpDialog() {
                                     💡 名刺画像・メール署名からAI登録
                                 </h4>
                                 <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
-                                    <li><strong>名刺</strong>: スマホでの撮影やペーストで画像をアップロード。</li>
+                                    <li><strong>名刺</strong>: スマホでの撮影画像やEightに取り込んだ名刺の画像をコピー＆ペーストでアップロード。</li>
                                     <li><strong>署名</strong>: メールの署名を貼り付けて「AIで解析」。</li>
                                     <li><strong>メリット</strong>: 氏名・会社名・住所などをAIが自動判別して一括入力します。</li>
                                 </ul>
@@ -52,7 +52,7 @@ export function HelpDialog() {
                                 📦 2. 商品リストの管理
                             </h3>
                             <p className="text-gray-600 text-sm leading-relaxed">
-                                商品リストから発送する商品を選びます。よく使う商品は事前登録がスムーズです。
+                                カタログ商品など、頻繁にサンプル発送する商品は事前に登録されています。登録のない商品は新しく登録が必要です。
                             </p>
                             <div className="bg-green-50 p-4 rounded-lg space-y-2 border border-green-100">
                                 <h4 className="font-bold text-green-900 flex items-center gap-1">
@@ -79,7 +79,7 @@ export function HelpDialog() {
                                 <ol className="text-sm text-indigo-800 space-y-1 list-decimal list-inside">
                                     <li>「AIで自動入力」をON。</li>
                                     <li>マイクボタンを押して口頭で指示。</li>
-                                    <li>「〇〇さんの佐藤さんに商品Aを2個」などと話す。</li>
+                                    <li>「〇〇食品の佐藤さんに商品Aを2個」などと話す。</li>
                                     <li>録音を停止し「AIで解析」でフォームが自動で埋まります。</li>
                                 </ol>
                             </div>
@@ -99,9 +99,14 @@ export function HelpDialog() {
                                 📧 4. メール送信と履歴管理
                             </h3>
                             <p className="text-gray-600 text-sm leading-relaxed">
-                                発送依頼（社内）、お知らせ（得意先）、フォローアップの3種類のメールを生成できます。
+                                アプリから3種類のメールを生成できます。
                             </p>
-                            <div className="bg-orange-50 p-4 rounded-lg space-y-2 border border-orange-100">
+                            <ul className="text-sm text-gray-700 space-y-2 list-none">
+                                <li><strong>１．発送依頼（社内）</strong>: 自分やデリバリー担当にサンプル発送依頼メールを送信します。</li>
+                                <li><strong>２．お知らせ（得意先）</strong>: サンプル手配を行ったことを着日とともにお客様にお知らせします。</li>
+                                <li><strong>３．フォローアップ（得意先）</strong>: 後日サンプルの評価を聞くためにメールを送ります。導入商品の販売計画のためにも必要です。</li>
+                            </ul>
+                            <div className="bg-orange-50 p-4 rounded-lg space-y-2 border border-orange-100 mt-2">
                                 <h4 className="font-bold text-orange-900 flex items-center gap-1">
                                     💡 自動BCC機能
                                 </h4>
