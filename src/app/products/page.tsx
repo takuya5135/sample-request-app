@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import Link from 'next/link'
 import { ExcelImportButton } from './excel-import-button'
+import { TemplateDownloadButton } from './template-download-button'
 import { DeleteProductButton } from './delete-button'
 
 export const dynamic = 'force-dynamic'
@@ -32,6 +33,7 @@ export default async function ProductsPage() {
                         </p>
                     </div>
                     <div className="flex gap-2">
+                        <TemplateDownloadButton />
                         <ExcelImportButton />
                     </div>
                 </div>
