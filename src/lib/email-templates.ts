@@ -58,8 +58,9 @@ export function generateCustomerNoticeEmail(data: EmailRequestData) {
         : data.deliveryDate
 
     const body = `${data.companyName}
-${data.department || ''}
-${data.lastName} 様
+${data.lastName}
+
+いつもお世話になりありがとうございます。
 
 ご依頼いただいておりましたサンプルの手配が完了いたしました。
 以下の内容でお届け予定です。
@@ -76,7 +77,7 @@ ${productList}
 引き続きよろしくお願い申し上げます。
 
 --------------------------------------------------
-${data.userCompanyName || 'ジャパン・フード・サービス'}
+${data.userCompanyName}
 ${data.userLastName}
 --------------------------------------------------`
 
@@ -92,8 +93,9 @@ export function generateCustomerFollowupEmail(data: EmailRequestData) {
         .join('\n')
 
     const body = `${data.companyName}
-${data.department || ''}
-${data.lastName} 様
+${data.lastName}
+
+いつもお世話になりありがとうございます。
 
 先日お送りいたしましたサンプルにつきまして、その後いかがでしたでしょうか。
 もしよろしければ、社内でのご評価やご意見などをお聞かせいただけますと幸いです。
@@ -105,7 +107,7 @@ ${productList}
 ご検討のほど、何卒よろしくお願い申し上げます。
 
 --------------------------------------------------
-${data.userCompanyName || 'ジャパン・フード・サービス'}
+${data.userCompanyName}
 ${data.userLastName}
 --------------------------------------------------`
 
