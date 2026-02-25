@@ -53,6 +53,12 @@ export function generateCustomerNoticeEmail(data: EmailRequestData) {
 
     const userCompanyLine = data.userCompanyName ? `${data.userCompanyName}の` : 'ジャパン・フード・サービスの'
 
+    // 日付を「〇月〇日」形式に変換
+    const dateObj = new Date(data.deliveryDate)
+    const formattedDate = !isNaN(dateObj.getTime())
+        ? `${dateObj.getMonth() + 1}月${dateObj.getDate()}日`
+        : data.deliveryDate
+
     const body = `${data.companyName}
 ${data.department || ''}
 ${data.lastName} 様
@@ -61,10 +67,10 @@ ${data.lastName} 様
 ${userCompanyLine}${data.userLastName}です。
 
 ご依頼いただいておりましたサンプルの手配が完了いたしました。
-以下の内容でお届けにあがります。
+以下の内容でお届け予定です。
 
 【お届け予定日】
-${data.deliveryDate} ${data.deliveryTime}
+${formattedDate} ${data.deliveryTime}
 
 【お届けする商品】
 ${productList}
@@ -72,7 +78,12 @@ ${productList}
 到着まで今しばらくお待ちくださいませ。
 ご不明な点がございましたら、お気軽にご連絡ください。
 
-引き続きよろしくお願い申し上げます。`
+引き続きよろしくお願い申し上げます。
+
+--------------------------------------------------
+${data.userCompanyName || 'ジャパン・フード・サービス'}
+${data.userLastName}
+--------------------------------------------------`
 
     return { subject, body }
 }
@@ -101,7 +112,12 @@ ${userCompanyLine}${data.userLastName}です。
 ${productList}
 
 調理方法や歩留まり、その他ご不明な点がございましたら、いつでもサポートさせていただきます。
-ご検討のほど、何卒よろしくお願い申し上げます。`
+ご検討のほど、何卒よろしくお願い申し上げます。
+
+--------------------------------------------------
+${data.userCompanyName || 'ジャパン・フード・サービス'}
+${data.userLastName}
+--------------------------------------------------`
 
     return { subject, body }
 }
