@@ -2,6 +2,13 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog'
 import { EmailRequestData, generateInternalRequestEmail, generateCustomerNoticeEmail, generateCustomerFollowupEmail, createMailtoLink } from '@/lib/email-templates'
 import { Mail, FileText } from 'lucide-react'
 
@@ -15,7 +22,7 @@ export function RequestList({ requests, currentUserEmail, userProfile }: Request
     const userLastName = userProfile?.last_name || ''
     const userCompanyName = userProfile?.company_name || ''
 
-    const handleEmailAction = (type: 'internal' | 'notice' | 'followup', req: any) => {
+    const handleEmailAction = (type: 'internal' | 'notice' | 'followup', req: any, internalOptions?: { type: 'self' | 'delivery', prefix?: string }) => {
         const data: EmailRequestData = {
             companyName: req.address_book?.company_name || '企業名不明',
             department: req.address_book?.department || '',
@@ -37,10 +44,14 @@ export function RequestList({ requests, currentUserEmail, userProfile }: Request
 
         if (type === 'internal') {
             const res = generateInternalRequestEmail(data)
-            subject = res.subject
+            if (internalOptions?.type === 'delivery') {
+                subject = `${internalOptions.prefix} ${res.subject}`
+                to = "jfkakou@japanfoodservice.co.jp"
+            } else {
+                subject = res.subject
+                to = currentUserEmail
+            }
             body = res.body
-            // デリバリー担当のアドレスを仮で指定（運用に合わせて変更可）
-            to = "delivery@example.com"
         } else if (type === 'notice') {
             const res = generateCustomerNoticeEmail(data)
             subject = res.subject
@@ -95,15 +106,41 @@ export function RequestList({ requests, currentUserEmail, userProfile }: Request
 
                         <div className="flex flex-col gap-2 justify-center">
                             <h3 className="text-sm font-semibold text-gray-500 mb-1">メール作成アクション</h3>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="w-full justify-start border-blue-200 hover:bg-blue-50 text-blue-700"
-                                onClick={() => handleEmailAction('internal', req)}
-                            >
-                                <Mail className="w-4 h-4 mr-2" />
-                                手配依頼メールを作成 (社内向け)
-                            </Button>
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-full justify-start border-blue-200 hover:bg-blue-50 text-blue-700"
+                                    >
+                                        <Mail className="w-4 h-4 mr-2" />
+                                        手配依頼メールを作成 (社内向け)
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-md">
+                                    <DialogHeader>
+                                        <DialogTitle>手配依頼メールの宛先を選択</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="space-y-6 py-4">
+                                        <div className="space-y-3">
+                                            <h4 className="font-semibold text-sm text-gray-700">自分へ贈る場合</h4>
+                                            <Button variant="outline" className="w-full justify-start bg-gray-50 hover:bg-gray-100 border-gray-300" onClick={() => handleEmailAction('internal', req, { type: 'self' })}>
+                                                自分のメールアドレスで作成
+                                            </Button>
+                                        </div>
+                                        <div className="space-y-3">
+                                            <h4 className="font-semibold text-sm text-gray-700">デリバリーに依頼する場合 <span className="text-xs font-normal text-gray-500">(jfkakou@...)</span></h4>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                {['米山', '山口', '東', '水島'].map(name => (
+                                                    <Button key={name} variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50" onClick={() => handleEmailAction('internal', req, { type: 'delivery', prefix: `${name}さん` })}>
+                                                        {name}さん宛で作成
+                                                    </Button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
                             <Button
                                 variant="outline"
                                 size="sm"
