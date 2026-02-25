@@ -65,9 +65,27 @@ export function CreateAddressDialog() {
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
+        handleFileSelect(file)
+    }
+
+    const handlePaste = (e: React.ClipboardEvent) => {
+        const items = e.clipboardData.items
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+                const file = items[i].getAsFile()
+                if (file) {
+                    e.preventDefault() // デフォルトの貼り付け動作をキャンセル（不要な場合は削除可能）
+                    handleFileSelect(file)
+                    break
+                }
+            }
+        }
+    }
+
+    const handleFileSelect = (file?: File | null) => {
         if (!file) return
         if (!file.type.startsWith('image/')) {
-            alert('画像ファイルを選択してください')
+            alert('画像ファイルを選択またはペーストしてください')
             return
         }
 
@@ -77,7 +95,7 @@ export function CreateAddressDialog() {
             const base64Data = result.split(',')[1]
             setAiImageBase64(base64Data)
             setAiMimeType(file.type)
-            setAiImageName(file.name)
+            setAiImageName(`クリップボードの画像 (${new Date().toLocaleTimeString()})`)
         }
         reader.readAsDataURL(file)
     }
@@ -139,7 +157,10 @@ export function CreateAddressDialog() {
                     )}
 
                     {showAiPanel && (
-                        <div className="border border-indigo-100 rounded-lg p-3 my-4 bg-indigo-50/50 space-y-3">
+                        <div
+                            className="border border-indigo-100 rounded-lg p-3 my-4 bg-indigo-50/50 space-y-3"
+                            onPaste={handlePaste}
+                        >
                             <div className="flex justify-between items-center">
                                 <Label className="font-semibold text-indigo-900">✨ AI自動入力</Label>
                                 <Button type="button" variant="ghost" size="sm" onClick={() => setShowAiPanel(false)} className="h-6 px-2 text-xs">閉じる</Button>
@@ -154,7 +175,7 @@ export function CreateAddressDialog() {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-xs">または名刺画像をアップロード</Label>
+                                <Label className="text-xs">または名刺画像をアップロード<span className="text-indigo-500 font-normal ml-2">(Ctrl+Vで直接貼付も可能)</span></Label>
                                 <Input type="file" accept="image/*" onChange={handleImageUpload} className="text-xs" />
                                 {aiImageName && <p className="text-xs text-green-600 truncate mt-1">選択中: {aiImageName}</p>}
                             </div>
