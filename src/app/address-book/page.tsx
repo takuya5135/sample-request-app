@@ -2,13 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import { Header } from '@/components/layout/header'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import Link from 'next/link'
-import { DeleteAddressButton } from './delete-button'
-import { EditAddressDialog } from './edit-dialog'
 import { CreateAddressDialog } from './create-dialog'
-
-import { DuplicateAddressDialog } from './duplicate-dialog'
+import { AddressTable } from './address-table'
 
 export default async function AddressBookPage() {
     const supabase = (await createClient()) as any
@@ -43,35 +39,8 @@ export default async function AddressBookPage() {
                     <CardContent>
                         {error && <p className="text-red-500 text-sm mb-4">エラーが発生しました: {error.message}</p>}
 
-                        {addresses && addresses.length === 0 ? (
-                            <p className="text-gray-500 text-sm">登録されている住所データがありません。</p>
-                        ) : (
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>会社名</TableHead>
-                                        <TableHead>部署名</TableHead>
-                                        <TableHead>氏名</TableHead>
-                                        <TableHead>電話番号</TableHead>
-                                        <TableHead className="w-[120px]"></TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {addresses?.map((address: any) => (
-                                        <TableRow key={address.id}>
-                                            <TableCell className="font-medium">{address.company_name}</TableCell>
-                                            <TableCell>{address.department}</TableCell>
-                                            <TableCell>{address.last_name} {address.first_name}</TableCell>
-                                            <TableCell>{address.phone}</TableCell>
-                                            <TableCell className="text-right flex items-center justify-end gap-1">
-                                                <DuplicateAddressDialog address={address} />
-                                                <EditAddressDialog address={address} />
-                                                <DeleteAddressButton id={address.id} />
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                        {!error && addresses && (
+                            <AddressTable initialAddresses={addresses} />
                         )}
 
                         <div className="mt-6 flex justify-start">
