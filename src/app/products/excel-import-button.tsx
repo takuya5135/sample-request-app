@@ -30,16 +30,25 @@ export function ExcelImportButton() {
                 unit: String(row['単位'] || row['Unit'] || row['unit'] || '個')
             })).filter(r => r.md_code && r.product_name)
 
-            if (formattedData.length === 0) {
+            // MDコードの重複を排除（後の行で上書き）
+            const mdCodeMap = new Map<string, any>()
+            formattedData.forEach((item: any) => {
+                mdCodeMap.set(item.md_code, item)
+            })
+            const deduplicatedData = Array.from(mdCodeMap.values())
+
+            if (deduplicatedData.length === 0) {
                 alert('インポート可能なデータがありません。Excelの1行目に「MDコード」「商品名」「規格」「単位」の列があるか確認してください。')
                 return
             }
 
             startTransition(async () => {
                 try {
-                    const result = await importProducts(formattedData)
+                    const result = await importProducts(deduplicatedData)
                     if (result.success) {
-                        alert(`${formattedData.length}件の商品データを登録・更新しました。`)
+                        alert(`${deduplicatedData.length}件の商品データを登録・更新しました。`)
+                    } else {
+                        alert(`エラー: ${result.error}`)
                     }
                 } catch (err: any) {
                     alert(err.message)

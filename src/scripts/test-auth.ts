@@ -20,6 +20,7 @@ async function testAuth() {
     console.log('--- サインインのテスト ---')
 
     // テスト用のログイン処理
+    // @ts-ignore
     const { data, error } = await supabase.auth.signInWithPassword({
         email: 'hata@japanfoodservice.co.jp',
         password: 'hata' // <- 先ほど設定されたパスワードを指定してください（異なる場合は変更）

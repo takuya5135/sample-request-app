@@ -8,7 +8,7 @@ export async function importProducts(products: any[]) {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-        throw new Error('ログインが必要です')
+        return { success: false, error: 'ログインが必要です' }
     }
 
     const { error } = await supabase
@@ -17,7 +17,7 @@ export async function importProducts(products: any[]) {
 
     if (error) {
         console.error('Products Import Error:', error)
-        throw new Error('商品データの登録に失敗しました')
+        return { success: false, error: `商品データの登録に失敗しました: ${error.message}` }
     }
 
     revalidatePath('/products')
