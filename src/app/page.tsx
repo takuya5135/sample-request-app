@@ -48,6 +48,8 @@ export default async function Home() {
         return {
           mdCode: productDetail?.md_code || '',
           productName: productDetail?.product_name || '不明な商品',
+          specification: productDetail?.specification || '',
+          unit: productDetail?.unit || '',
           quantity: item.quantity
         }
       })

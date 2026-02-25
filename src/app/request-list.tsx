@@ -12,8 +12,7 @@ type RequestListProps = {
 }
 
 export function RequestList({ requests, currentUserEmail, userProfile }: RequestListProps) {
-    // ユーザーの姓と会社名をプロフィールから取得、未設定時は仮生成
-    const userLastName = userProfile?.last_name || currentUserEmail.split('@')[0]
+    const userLastName = userProfile?.last_name || ''
     const userCompanyName = userProfile?.company_name || ''
 
     const handleEmailAction = (type: 'internal' | 'notice' | 'followup', req: any) => {

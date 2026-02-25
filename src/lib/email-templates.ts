@@ -8,7 +8,7 @@ export type EmailRequestData = {
     phone: string
     deliveryDate: string
     deliveryTime: string
-    products: { mdCode: string, productName: string, quantity: number }[]
+    products: { mdCode: string, productName: string, quantity: number, specification?: string, unit?: string }[]
     userCompanyName: string // システムユーザーの会社名
     userLastName: string // システムユーザーの姓
 }
@@ -18,7 +18,7 @@ export function generateInternalRequestEmail(data: EmailRequestData) {
     const subject = `【サンプル手配依頼】 ${data.companyName}様 ${data.deliveryDate}着`
 
     const productList = data.products
-        .map(p => `・${p.mdCode} ${p.productName} x ${p.quantity}`)
+        .map(p => `・${p.mdCode} ${p.productName} ${p.specification || ''} ${p.quantity}${p.unit || ''}`)
         .join('\n')
 
     const body = `お疲れ様です。
@@ -48,10 +48,8 @@ export function generateCustomerNoticeEmail(data: EmailRequestData) {
     const subject = `【ご案内】サンプルの手配につきまして`
 
     const productList = data.products
-        .map(p => `・${p.productName} x ${p.quantity}`)
+        .map(p => `・${p.productName} ${p.specification || ''} x ${p.quantity}${p.unit || ''}`)
         .join('\n')
-
-    const userCompanyLine = data.userCompanyName ? `${data.userCompanyName}の` : 'ジャパン・フード・サービスの'
 
     // 日付を「〇月〇日」形式に変換
     const dateObj = new Date(data.deliveryDate)
@@ -62,9 +60,6 @@ export function generateCustomerNoticeEmail(data: EmailRequestData) {
     const body = `${data.companyName}
 ${data.department || ''}
 ${data.lastName} 様
-
-いつも大変お世話になっております。
-${userCompanyLine}${data.userLastName}です。
 
 ご依頼いただいておりましたサンプルの手配が完了いたしました。
 以下の内容でお届け予定です。
@@ -93,17 +88,12 @@ export function generateCustomerFollowupEmail(data: EmailRequestData) {
     const subject = `【ご確認】先日お送りしたサンプルの件につきまして`
 
     const productList = data.products
-        .map(p => `・${p.productName}`)
+        .map(p => `・${p.productName} ${p.specification || ''}`)
         .join('\n')
-
-    const userCompanyLine = data.userCompanyName ? `${data.userCompanyName}の` : 'ジャパン・フード・サービスの'
 
     const body = `${data.companyName}
 ${data.department || ''}
 ${data.lastName} 様
-
-いつも大変お世話になっております。
-${userCompanyLine}${data.userLastName}です。
 
 先日お送りいたしましたサンプルにつきまして、その後いかがでしたでしょうか。
 もしよろしければ、社内でのご評価やご意見などをお聞かせいただけますと幸いです。
