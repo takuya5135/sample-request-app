@@ -9,7 +9,8 @@ export type EmailRequestData = {
     deliveryDate: string
     deliveryTime: string
     products: { mdCode: string, productName: string, quantity: number }[]
-    userLastName: string // システムを利用しているユーザーの姓（署名用）
+    userCompanyName: string // システムユーザーの会社名
+    userLastName: string // システムユーザーの姓
 }
 
 // 機能1: サンプル発送依頼メールの生成 (社内向け)
@@ -47,15 +48,17 @@ export function generateCustomerNoticeEmail(data: EmailRequestData) {
     const subject = `【ご案内】サンプルの手配につきまして`
 
     const productList = data.products
-        .map(p => `・${p.mdCode} ${p.productName} x ${p.quantity}`)
+        .map(p => `・${p.productName} x ${p.quantity}`)
         .join('\n')
+
+    const userCompanyLine = data.userCompanyName ? `${data.userCompanyName}の` : 'ジャパン・フード・サービスの'
 
     const body = `${data.companyName}
 ${data.department || ''}
-${data.lastName} ${data.firstName || ''} 様
+${data.lastName} 様
 
 いつも大変お世話になっております。
-ジャパン・フード・サービスの${data.userLastName}です。
+${userCompanyLine}${data.userLastName}です。
 
 ご依頼いただいておりましたサンプルの手配が完了いたしました。
 以下の内容でお届けにあがります。
@@ -79,15 +82,17 @@ export function generateCustomerFollowupEmail(data: EmailRequestData) {
     const subject = `【ご確認】先日お送りしたサンプルの件につきまして`
 
     const productList = data.products
-        .map(p => `・${p.mdCode} ${p.productName}`)
+        .map(p => `・${p.productName}`)
         .join('\n')
+
+    const userCompanyLine = data.userCompanyName ? `${data.userCompanyName}の` : 'ジャパン・フード・サービスの'
 
     const body = `${data.companyName}
 ${data.department || ''}
-${data.lastName} ${data.firstName || ''} 様
+${data.lastName} 様
 
 いつも大変お世話になっております。
-ジャパン・フード・サービスの${data.userLastName}です。
+${userCompanyLine}${data.userLastName}です。
 
 先日お送りいたしましたサンプルにつきまして、その後いかがでしたでしょうか。
 もしよろしければ、社内でのご評価やご意見などをお聞かせいただけますと幸いです。

@@ -12,6 +12,12 @@ export default async function AddressBookPage() {
     const supabase = (await createClient()) as any
     const { data: { user } } = await supabase.auth.getUser()
 
+    let userProfile: any = null
+    if (user) {
+        const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+        userProfile = profile || { email: user.email }
+    }
+
     // 住所録データの取得（削除済みのものは除外）
     const { data: addresses, error } = await supabase
         .from('address_book')
@@ -21,7 +27,7 @@ export default async function AddressBookPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
-            <Header email={user?.email} />
+            <Header profile={userProfile} />
 
             <main className="flex-1 w-full max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
                 <div className="mb-8 flex items-center justify-between">

@@ -8,11 +8,13 @@ import { Mail, FileText } from 'lucide-react'
 type RequestListProps = {
     requests: any[]
     currentUserEmail: string
+    userProfile?: any
 }
 
-export function RequestList({ requests, currentUserEmail }: RequestListProps) {
-    // ユーザーの姓をメールアドレスのローカルパートなどから仮生成
-    const userLastName = currentUserEmail.split('@')[0]
+export function RequestList({ requests, currentUserEmail, userProfile }: RequestListProps) {
+    // ユーザーの姓と会社名をプロフィールから取得、未設定時は仮生成
+    const userLastName = userProfile?.last_name || currentUserEmail.split('@')[0]
+    const userCompanyName = userProfile?.company_name || ''
 
     const handleEmailAction = (type: 'internal' | 'notice' | 'followup', req: any) => {
         const data: EmailRequestData = {
@@ -26,6 +28,7 @@ export function RequestList({ requests, currentUserEmail }: RequestListProps) {
             deliveryDate: req.delivery_date,
             deliveryTime: req.delivery_time === 'am' ? '午前中' : req.delivery_time,
             products: req.mappedProducts || [],
+            userCompanyName: userCompanyName,
             userLastName: userLastName
         }
 

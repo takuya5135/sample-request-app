@@ -1,7 +1,8 @@
 import { signout } from '@/app/login/actions'
 import { Button } from '@/components/ui/button'
+import { ProfileDialog } from './profile-dialog'
 
-export function Header({ email }: { email?: string }) {
+export function Header({ profile }: { profile?: any }) {
     return (
         <header className="bg-white border-b sticky top-0 z-10">
             <div className="flex h-16 items-center justify-between px-4 max-w-5xl mx-auto w-full">
@@ -13,11 +14,12 @@ export function Header({ email }: { email?: string }) {
                     サンプル依頼支援アプリ
                 </div>
 
-                {email && (
-                    <div className="flex items-center gap-4">
-                        <span className="text-sm text-gray-600 hidden sm:inline-block">
-                            {email}
+                {profile?.email && (
+                    <div className="flex items-center gap-2 sm:gap-4">
+                        <span className="text-sm text-gray-600 hidden sm:inline-block truncate max-w-[200px]">
+                            {profile.company_name ? `${profile.company_name} ${profile.last_name}` : profile.email}
                         </span>
+                        <ProfileDialog profile={profile} />
                         <form action={signout}>
                             <Button variant="outline" size="sm">ログアウト</Button>
                         </form>

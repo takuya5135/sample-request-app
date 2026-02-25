@@ -12,8 +12,12 @@ export default async function Home() {
   const { data: { user } } = await supabase.auth.getUser()
 
   let mappedRequests: any[] = []
+  let userProfile: any = null
 
   if (user) {
+    const { data: profileData } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+    userProfile = profileData || { email: user.email }
+
     // 発送依頼データと住所録を結合して取得
     const { data: shippingData } = await supabase
       .from('shipping_data')
@@ -48,7 +52,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Header email={user?.email} />
+      <Header profile={userProfile} />
 
       <main className="flex-1 w-full max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
         <div className="mb-8">
@@ -101,6 +105,7 @@ export default async function Home() {
           <RequestList
             requests={mappedRequests}
             currentUserEmail={user.email || 'user@example.com'}
+            userProfile={userProfile}
           />
         )}
       </main>
