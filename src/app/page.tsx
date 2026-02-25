@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { Header } from '@/components/layout/header'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -15,7 +16,12 @@ export default async function Home() {
   let userProfile: any = null
 
   if (user) {
-    const { data: profileData } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+    // 署名などの欠落を防ぐため、強制的に管理者権限でプロフィール取得を読込
+    const adminClient = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+    const { data: profileData } = await adminClient.from('profiles').select('*').eq('id', user.id).single()
     if (profileData) {
       userProfile = {
         id: profileData.id,

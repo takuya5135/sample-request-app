@@ -15,10 +15,16 @@ export type EmailRequestData = {
 
 // 機能1: サンプル発送依頼メールの生成 (社内向け)
 export function generateInternalRequestEmail(data: EmailRequestData) {
-    const subject = `【サンプル手配依頼】 ${data.companyName}様 ${data.deliveryDate}着`
+    // 日付を「〇月〇日」形式に変換
+    const dateObj = new Date(data.deliveryDate)
+    const formattedDate = !isNaN(dateObj.getTime())
+        ? `${dateObj.getMonth() + 1}月${dateObj.getDate()}日`
+        : data.deliveryDate
+
+    const subject = `【サンプル手配依頼】 ${data.companyName} ${data.lastName} 様 ${formattedDate}着`
 
     const productList = data.products
-        .map(p => `・${p.mdCode} ${p.productName} ${p.specification || ''} ${p.quantity}${p.unit || ''}`)
+        .map(p => `・${p.mdCode} ${p.productName} ${p.specification || ''} × ${p.quantity}${p.unit || ''}`)
         .join('\n')
 
     const body = `お疲れ様です。
@@ -33,12 +39,14 @@ export function generateInternalRequestEmail(data: EmailRequestData) {
 電話番号: ${data.phone || ''}
 
 【着日指定】
-${data.deliveryDate}  ${data.deliveryTime}
+${formattedDate}  ${data.deliveryTime}
 
 【依頼商品】
 ${productList}
 
-よろしくお願いいたします。`
+よろしくお願いいたします。
+
+${data.userLastName}`
 
     return { subject, body }
 }
@@ -48,7 +56,7 @@ export function generateCustomerNoticeEmail(data: EmailRequestData) {
     const subject = `【ご案内】サンプルの手配につきまして`
 
     const productList = data.products
-        .map(p => `・${p.productName} ${p.specification || ''} x ${p.quantity}${p.unit || ''}`)
+        .map(p => `・${p.productName} ${p.specification || ''} × ${p.quantity}${p.unit || ''}`)
         .join('\n')
 
     // 日付を「〇月〇日」形式に変換
@@ -58,7 +66,7 @@ export function generateCustomerNoticeEmail(data: EmailRequestData) {
         : data.deliveryDate
 
     const body = `${data.companyName}
-${data.lastName}
+${data.lastName}様
 
 いつもお世話になりありがとうございます。
 
@@ -93,7 +101,7 @@ export function generateCustomerFollowupEmail(data: EmailRequestData) {
         .join('\n')
 
     const body = `${data.companyName}
-${data.lastName}
+${data.lastName}様
 
 いつもお世話になりありがとうございます。
 
