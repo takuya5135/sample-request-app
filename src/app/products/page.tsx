@@ -7,6 +7,8 @@ import Link from 'next/link'
 import { ExcelImportButton } from './excel-import-button'
 import { DeleteProductButton } from './delete-button'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ProductsPage() {
     const supabase = (await createClient()) as any
     const { data: { user } } = await supabase.auth.getUser()

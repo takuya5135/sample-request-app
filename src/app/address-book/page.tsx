@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { CreateAddressDialog } from './create-dialog'
 import { AddressTable } from './address-table'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AddressBookPage() {
     const supabase = (await createClient()) as any
     const { data: { user } } = await supabase.auth.getUser()

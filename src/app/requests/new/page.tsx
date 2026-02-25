@@ -15,6 +15,8 @@ import { parseShippingRequest } from './ai-action'
 import { createShippingRequest } from './submit-action'
 import { createClient } from '@/lib/supabase/client'
 
+export const dynamic = 'force-dynamic'
+
 export default function RequestFormPage() {
     const router = useRouter()
     const [useAI, setUseAI] = useState(false)
