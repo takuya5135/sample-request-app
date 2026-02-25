@@ -123,7 +123,7 @@ export function RequestList({ requests, currentUserEmail, userProfile }: Request
                                     </DialogHeader>
                                     <div className="space-y-6 py-4">
                                         <div className="space-y-3">
-                                            <h4 className="font-semibold text-sm text-gray-700">自分へ贈る場合</h4>
+                                            <h4 className="font-semibold text-sm text-gray-700">自分へ送る場合</h4>
                                             <Button variant="outline" className="w-full justify-start bg-gray-50 hover:bg-gray-100 border-gray-300" onClick={() => handleEmailAction('internal', req, { type: 'self' })}>
                                                 自分のメールアドレスで作成
                                             </Button>
