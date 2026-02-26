@@ -3,6 +3,7 @@ import { Header } from '@/components/layout/header'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ExcelImportButton } from './excel-import-button'
 import { TemplateDownloadButton } from './template-download-button'
@@ -18,6 +19,10 @@ export default async function ProductsPage() {
     if (user) {
         const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
         if (profile) {
+            if (!profile.is_approved) {
+                redirect('/pending-approval')
+            }
+
             userProfile = {
                 id: profile.id,
                 email: profile.email || user.email,

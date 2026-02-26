@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Header } from '@/components/layout/header'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { CreateAddressDialog } from './create-dialog'
 import { AddressTable } from './address-table'
@@ -16,6 +17,10 @@ export default async function AddressBookPage() {
     if (user) {
         const { data: profileData } = await supabase.from('profiles').select('*').eq('id', user.id).single()
         if (profileData) {
+            if (!profileData.is_approved) {
+                redirect('/pending-approval')
+            }
+
             userProfile = {
                 id: profileData.id,
                 email: profileData.email || user.email,

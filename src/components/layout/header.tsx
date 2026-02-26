@@ -18,6 +18,11 @@ export function Header({ profile }: { profile?: any }) {
 
                 {profile?.email && (
                     <div className="flex items-center gap-2 sm:gap-4">
+                        {profile.role === 'admin' && (
+                            <Link href="/admin/users" className="hidden sm:inline-block">
+                                <Button variant="ghost" size="sm" className="text-gray-600">ユーザー管理</Button>
+                            </Link>
+                        )}
                         <span className="text-sm text-gray-600 hidden sm:inline-block truncate max-w-[200px]">
                             {profile.company_name ? `${profile.company_name} ${profile.last_name}` : profile.email}
                         </span>

@@ -4,6 +4,7 @@ import { Header } from '@/components/layout/header'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { RequestList } from './request-list'
 
 export const dynamic = 'force-dynamic'
@@ -23,6 +24,10 @@ export default async function Home() {
     )
     const { data: profileData } = await adminClient.from('profiles').select('*').eq('id', user.id).single()
     if (profileData) {
+      if (!profileData.is_approved) {
+        redirect('/pending-approval')
+      }
+
       userProfile = {
         id: profileData.id,
         email: profileData.email || user.email,

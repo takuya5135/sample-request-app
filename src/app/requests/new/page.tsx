@@ -61,6 +61,11 @@ export default function RequestFormPage() {
             if (user) {
                 const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
                 if (profile) {
+                    if (!profile.is_approved) {
+                        window.location.href = '/pending-approval'
+                        return
+                    }
+
                     setUserProfile({
                         id: profile.id,
                         email: profile.email || user.email,
