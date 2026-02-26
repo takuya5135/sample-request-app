@@ -53,18 +53,30 @@ ${JSON.stringify(products.map(p => ({ id: p.id, md_code: p.md_code, product_name
 `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.0-flash',
       contents: prompt,
     });
 
-    const text = response.text;
-    // jsonパース用の処理
-    const jsonStr = text?.replace(/```json/g, '').replace(/```/g, '').trim();
-    if (!jsonStr) throw new Error("AIからの応答が空です");
+    // @google/genai SDK v1.x では response.text が文字列プロパティとして提供されることが多いですが、
+    // 万が一関数だった場合のエラーも防ぐため、明示的に文字列化して扱います。
+    const resultText = typeof response.text === 'function' ? (response as any).text() : response.text;
 
-    return JSON.parse(jsonStr);
-  } catch (error) {
-    console.error("AI Parse Error:", error);
-    throw new Error('入力の解析に失敗しました。詳細にもう少し書いてみてください。');
+    if (!resultText) {
+      console.error("AIからの応答が空または不正な形式です:", response);
+      throw new Error("AIからの応答が空です");
+    }
+
+    // jsonパース用の処理
+    const jsonStr = resultText.replace(/```json/g, '').replace(/```/g, '').trim();
+
+    try {
+      return JSON.parse(jsonStr);
+    } catch (parseError) {
+      console.error("JSON Parse Error. Raw text:", resultText);
+      throw new Error("AIからの応答データの形式が不正です。");
+    }
+  } catch (error: any) {
+    console.error("AI Parse Error Detailed:", error);
+    throw new Error(`入力の解析に失敗しました: ${error.message || '詳細にもう少し書いてみてください。'}`);
   }
 }

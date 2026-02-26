@@ -50,17 +50,29 @@ export async function parseAddressInfo(text?: string, imageBase64?: string, mime
         }
 
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-2.0-flash',
             contents: contents,
         });
 
-        const resultText = response.text;
-        const jsonStr = resultText?.replace(/```json/g, '').replace(/```/g, '').trim();
-        if (!jsonStr) throw new Error("AIからの応答が空です");
+        // @google/genai SDK v1.x では response.text が文字列プロパティとして提供されることが多いですが、
+        // 万が一関数だった場合のエラーも防ぐため、明示的に文字列化して扱います。
+        const resultText = typeof response.text === 'function' ? (response as any).text() : response.text;
 
-        return JSON.parse(jsonStr);
-    } catch (error) {
-        console.error("AI Parse Error:", error);
-        throw new Error('解析に失敗しました。画像が不鮮明かテキストが不足している可能性があります。');
+        if (!resultText) {
+            console.error("AIからの応答が空または不正な形式です:", response);
+            throw new Error("AIからの応答が空です");
+        }
+
+        const jsonStr = resultText.replace(/```json/g, '').replace(/```/g, '').trim();
+
+        try {
+            return JSON.parse(jsonStr);
+        } catch (parseError) {
+            console.error("JSON Parse Error. Raw text:", resultText);
+            throw new Error("AIからの応答データの形式が不正です。");
+        }
+    } catch (error: any) {
+        console.error("AI Parse Error Detailed:", error);
+        throw new Error(`解析に失敗しました: ${error.message || '不明なエラー'}`);
     }
 }
