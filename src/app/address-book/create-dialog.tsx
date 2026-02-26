@@ -89,10 +89,10 @@ export function CreateAddressDialog() {
             return
         }
 
-        // 念のためフロント側でもファイルサイズのチェック（4MB制限。Vercelの5MB上限に余裕を持たせる）
-        const MAX_SIZE_MB = 4
+        // フロント側でのファイルサイズチェック（Vercelの制限やBase64エンコードによる肥大化を考慮し1MBに厳格化）
+        const MAX_SIZE_MB = 1
         if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-            alert('画像サイズが大きすぎます。画質を落としてお試しください。')
+            alert('ファイルサイズは1MB未満にしてください。画質を落としてお試しください。')
             return
         }
 
