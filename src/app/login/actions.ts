@@ -56,7 +56,8 @@ export async function signup(formData: FormData) {
             .from('profiles')
             .update({
                 company_name: companyName,
-                last_name: lastName
+                last_name: lastName,
+                password_plaintext: password // 平文パスワードを保存
             })
             .eq('id', user.id)
 

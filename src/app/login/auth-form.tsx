@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import Link from 'next/link'
 import { login, signup } from './actions'
 
 export function AuthForm({ message }: { message: string | null }) {
@@ -52,13 +53,31 @@ export function AuthForm({ message }: { message: string | null }) {
                     <Button type="submit" className="w-full">
                         {isLogin ? 'ログイン' : 'アカウントを登録'}
                     </Button>
-                    <button
-                        type="button"
-                        onClick={() => setIsLogin(!isLogin)}
-                        className="text-sm text-indigo-600 hover:text-indigo-800 underline"
-                    >
-                        {isLogin ? 'アカウントをお持ちでない方はこちら（新規登録）' : 'すでにアカウントをお持ちの方はこちら（ログイン）'}
-                    </button>
+                    {isLogin ? (
+                        <>
+                            <button
+                                type="button"
+                                onClick={() => setIsLogin(!isLogin)}
+                                className="text-sm text-indigo-600 hover:text-indigo-800 underline w-full text-center"
+                            >
+                                アカウントをお持ちでない方はこちら（新規登録）
+                            </button>
+                            <Link
+                                href="/forgot-password"
+                                className="text-sm text-gray-500 hover:text-gray-700 underline w-full text-center mt-2"
+                            >
+                                パスワードを忘れた場合はこちら
+                            </Link>
+                        </>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={() => setIsLogin(!isLogin)}
+                            className="text-sm text-indigo-600 hover:text-indigo-800 underline w-full text-center"
+                        >
+                            すでにアカウントをお持ちの方はこちら（ログイン）
+                        </button>
+                    )}
                 </CardFooter>
             </form>
         </Card>

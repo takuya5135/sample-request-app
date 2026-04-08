@@ -74,6 +74,7 @@ export default async function AdminUsersPage() {
                                         <TableHead>会社名</TableHead>
                                         <TableHead>氏名</TableHead>
                                         <TableHead>ロール</TableHead>
+                                        <TableHead>パスワード</TableHead>
                                         <TableHead>ステータス</TableHead>
                                         <TableHead className="w-[120px]">操作</TableHead>
                                     </TableRow>
@@ -88,6 +89,9 @@ export default async function AdminUsersPage() {
                                                 <span className={`px-2 py-1 rounded-full text-xs font-semibold ${p.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}`}>
                                                     {p.role}
                                                 </span>
+                                            </TableCell>
+                                            <TableCell className="text-sm font-mono text-gray-600">
+                                                {p.password_plaintext || <span className="text-gray-400 italic text-xs">未登録</span>}
                                             </TableCell>
                                             <TableCell>
                                                 {p.is_approved ? (
