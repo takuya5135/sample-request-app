@@ -5,11 +5,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { login, signup } from './actions'
 
 export function AuthForm({ message }: { message: string | null }) {
     const [isLogin, setIsLogin] = useState(true)
+    const router = useRouter()
 
     return (
         <Card className="w-full max-w-sm">
@@ -62,12 +63,13 @@ export function AuthForm({ message }: { message: string | null }) {
                             >
                                 アカウントをお持ちでない方はこちら（新規登録）
                             </button>
-                            <Link
-                                href="/forgot-password"
+                            <button
+                                type="button"
+                                onClick={() => router.push('/forgot-password')}
                                 className="text-sm text-gray-500 hover:text-gray-700 underline w-full text-center mt-2"
                             >
                                 パスワードを忘れた場合はこちら
-                            </Link>
+                            </button>
                         </>
                     ) : (
                         <button
