@@ -63,13 +63,12 @@ export function AuthForm({ message }: { message: string | null }) {
                             >
                                 アカウントをお持ちでない方はこちら（新規登録）
                             </button>
-                            <button
-                                type="button"
-                                onClick={() => router.push('/forgot-password')}
-                                className="text-sm text-gray-500 hover:text-gray-700 underline w-full text-center mt-2"
+                            <a
+                                href="/forgot-password"
+                                className="text-sm text-gray-500 hover:text-gray-700 underline w-full text-center mt-2 block"
                             >
                                 パスワードを忘れた場合はこちら
-                            </button>
+                            </a>
                         </>
                     ) : (
                         <button
