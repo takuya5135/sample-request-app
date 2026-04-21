@@ -2,11 +2,17 @@
 
 import { GoogleGenAI } from '@google/genai';
 
-// Gemini APIクライアントの初期化
-const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY });
-
 export async function parseShippingRequest(input: string, addresses: any[], products: any[]) {
   try {
+    const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
+    if (!apiKey) {
+      console.error("GOOGLE_GEMINI_API_KEY is not set");
+      return { success: false, error: "AI解析用のAPIキーが設定されていません。管理者に確認してください。" };
+    }
+
+    // Gemini APIクライアントの初期化 (アクション内で行うことで安全性を高める)
+    const ai = new GoogleGenAI({ apiKey });
+
     // 日本時間での現在日付の取得
     const today = new Date();
     const jstDate = new Date(today.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
@@ -57,26 +63,26 @@ ${JSON.stringify(products.map(p => ({ id: p.id, md_code: p.md_code, product_name
       contents: prompt,
     });
 
-    // @google/genai SDK v1.x では response.text が文字列プロパティとして提供されることが多いですが、
-    // 万が一関数だった場合のエラーも防ぐため、明示的に文字列化して扱います。
     const resultText = typeof response.text === 'function' ? (response as any).text() : response.text;
 
     if (!resultText) {
-      console.error("AIからの応答が空または不正な形式です:", response);
-      throw new Error("AIからの応答が空です");
+      console.error("AIからの応答が空です:", response);
+      return { success: false, error: "AIからの応答が空でした。もう一度試してください。" };
     }
 
     // jsonパース用の処理
     const jsonStr = resultText.replace(/```json/g, '').replace(/```/g, '').trim();
 
     try {
-      return JSON.parse(jsonStr);
+      const data = JSON.parse(jsonStr);
+      return { success: true, data };
     } catch (parseError) {
       console.error("JSON Parse Error. Raw text:", resultText);
-      throw new Error("AIからの応答データの形式が不正です。");
+      return { success: false, error: "AIからの解析結果を正しく処理できませんでした。" };
     }
   } catch (error: any) {
-    console.error("AI Parse Error Detailed:", error);
-    throw new Error(`入力の解析に失敗しました: ${error.message || '詳細にもう少し書いてみてください。'}`);
+    console.error("AI Action Error:", error);
+    return { success: false, error: `AI解析中にエラーが発生しました: ${error.message || '不明なエラー'}` };
   }
 }
+

@@ -169,11 +169,16 @@ export default function RequestFormPage() {
                 }));
                 const result = await parseShippingRequest(aiInput, addressDataForAi, productDataForAi);
 
-                // alert('解析結果:\n' + JSON.stringify(result, null, 2))
+                if (!result.success) {
+                    alert(result.error || 'AI解析に失敗しました。');
+                    return;
+                }
+
+                const aiData = result.data;
 
                 // AI結果の反映 (商品リストの更新)
-                if (result.products && Array.isArray(result.products) && result.products.length > 0) {
-                    const mappedProducts = result.products.map((p: any, idx: number) => ({
+                if (aiData.products && Array.isArray(aiData.products) && aiData.products.length > 0) {
+                    const mappedProducts = aiData.products.map((p: any, idx: number) => ({
                         id: Date.now() + idx,
                         productId: p.product_id ? String(p.product_id) : '',
                         quantity: typeof p.quantity === 'number' ? p.quantity : 1
@@ -181,13 +186,13 @@ export default function RequestFormPage() {
                     setSelectedProducts(mappedProducts);
                 }
 
-                let targetId = result.address_id ? String(result.address_id) : null;
+                let targetId = aiData.address_id ? String(aiData.address_id) : null;
 
                 // 【最重要】AIがIDを見つけられずテキストだけ返してきた場合の、フロントエンド側での強力な自力マッピング（部分一致検索）
-                if (!targetId && result.company_name) {
+                if (!targetId && aiData.company_name) {
                     console.log("AI couldn't find ID. Executing frontend fallback text search...");
-                    const safeCompany = result.company_name.toLowerCase();
-                    const safeContact = `${result.last_name || ''} ${result.first_name || ''}`.trim().toLowerCase();
+                    const safeCompany = aiData.company_name.toLowerCase();
+                    const safeContact = `${aiData.last_name || ''} ${aiData.first_name || ''}`.trim().toLowerCase();
 
                     const fallbackMatch = addressOptions.find(opt => {
                         const optLabel = opt.label.toLowerCase(); // 会社名
@@ -223,8 +228,8 @@ export default function RequestFormPage() {
                             zipCode: matchedOption.postal_code || '',
                             address: matchedOption.address || '',
                             phone: matchedOption.phone || '',
-                            deliveryDate: result.delivery_date || prev.deliveryDate,
-                            deliveryTime: result.delivery_time || prev.deliveryTime
+                            deliveryDate: aiData.delivery_date || prev.deliveryDate,
+                            deliveryTime: aiData.delivery_time || prev.deliveryTime
                         }))
                         return // マッチした場合はここで終了
                     }
@@ -237,18 +242,18 @@ export default function RequestFormPage() {
                 // マッチしなかった場合は古い情報をクリアし、AIのテキスト解析結果だけを各項目に反映する
                 setFormData(prev => ({
                     ...prev,
-                    companyName: result.company_name || '',
-                    lastName: result.last_name || '',
-                    firstName: result.first_name || '',
+                    companyName: aiData.company_name || '',
+                    lastName: aiData.last_name || '',
+                    firstName: aiData.first_name || '',
                     department: '',
                     zipCode: '',
                     address: '',
-                    phone: result.phone || '',
-                    deliveryDate: result.delivery_date || prev.deliveryDate,
-                    deliveryTime: result.delivery_time || prev.deliveryTime
+                    phone: aiData.phone || '',
+                    deliveryDate: aiData.delivery_date || prev.deliveryDate,
+                    deliveryTime: aiData.delivery_time || prev.deliveryTime
                 }))
             } catch (err: any) {
-                alert(err.message)
+                alert('予期せぬエラーが発生しました: ' + err.message)
             }
         })
     }
@@ -301,6 +306,8 @@ export default function RequestFormPage() {
                 if (result.success) {
                     alert('依頼データを登録しました。')
                     router.push('/') // ダッシュボードへ戻る
+                } else {
+                    alert('登録に失敗しました: ' + (result.error || '不明なエラー'))
                 }
             } catch (err: any) {
                 alert('エラーが発生しました: ' + err.message)
