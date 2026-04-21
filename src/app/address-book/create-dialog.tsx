@@ -50,14 +50,19 @@ export function CreateAddressDialog() {
                 aiImageBase64 || undefined,
                 aiMimeType || undefined
             )
-            setFormData(prev => ({ ...prev, ...res }))
-            setAiInputText('')
-            setAiImageBase64(null)
-            setAiMimeType(null)
-            setAiImageName(null)
-            setShowAiPanel(false)
+            
+            if (res.success) {
+                setFormData(prev => ({ ...prev, ...res.data }))
+                setAiInputText('')
+                setAiImageBase64(null)
+                setAiMimeType(null)
+                setAiImageName(null)
+                setShowAiPanel(false)
+            } else {
+                alert(res.error || 'AI解析に失敗しました。')
+            }
         } catch (err: any) {
-            alert(err.message)
+            alert('予期せぬエラーが発生しました: ' + err.message)
         } finally {
             setIsAiLoading(false)
         }

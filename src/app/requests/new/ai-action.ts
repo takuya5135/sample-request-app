@@ -4,10 +4,11 @@ import { GoogleGenAI } from '@google/genai';
 
 export async function parseShippingRequest(input: string, addresses: any[], products: any[]) {
   try {
-    const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
+    // Vercel上の変数名(GEMINI_API_KEY)とローカルの変数名(GOOGLE_GEMINI_API_KEY)の両方に対応
+    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY;
     if (!apiKey) {
-      console.error("GOOGLE_GEMINI_API_KEY is not set");
-      return { success: false, error: "AI解析用のAPIキーが設定されていません。管理者に確認してください。" };
+      console.error("Gemini API key is not set (checked GEMINI_API_KEY and GOOGLE_GEMINI_API_KEY)");
+      return { success: false, error: "AI解析用のAPIキーが設定されていません。Vercelの環境変数に GEMINI_API_KEY が設定されているか確認してください。" };
     }
 
     // Gemini APIクライアントの初期化 (アクション内で行うことで安全性を高める)

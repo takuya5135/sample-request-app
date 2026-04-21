@@ -2,10 +2,16 @@
 
 import { GoogleGenAI } from '@google/genai';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY });
-
 export async function parseAddressInfo(text?: string, imageBase64?: string, mimeType?: string) {
     try {
+        const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY;
+        if (!apiKey) {
+            console.error("Gemini API key is not set");
+            return { success: false, error: "AI解析用のAPIキーが設定されていません。" };
+        }
+
+        const ai = new GoogleGenAI({ apiKey });
+
         const prompt = `
 あなたは名刺やメール署名から連絡先情報を抽出するアシスタントです。
 提供されたテキスト、または画像から以下の情報を抽出し、JSON形式で返してください。
@@ -54,25 +60,25 @@ export async function parseAddressInfo(text?: string, imageBase64?: string, mime
             contents: contents,
         });
 
-        // @google/genai SDK v1.x では response.text が文字列プロパティとして提供されることが多いですが、
-        // 万が一関数だった場合のエラーも防ぐため、明示的に文字列化して扱います。
         const resultText = typeof response.text === 'function' ? (response as any).text() : response.text;
 
         if (!resultText) {
-            console.error("AIからの応答が空または不正な形式です:", response);
-            throw new Error("AIからの応答が空です");
+            console.error("AIからの応答が空です:", response);
+            return { success: false, error: "AIからの応答が空でした。" };
         }
 
         const jsonStr = resultText.replace(/```json/g, '').replace(/```/g, '').trim();
 
         try {
-            return JSON.parse(jsonStr);
+            const data = JSON.parse(jsonStr);
+            return { success: true, data };
         } catch (parseError) {
             console.error("JSON Parse Error. Raw text:", resultText);
-            throw new Error("AIからの応答データの形式が不正です。");
+            return { success: false, error: "解析結果のデータ形式が不正です。" };
         }
     } catch (error: any) {
         console.error("AI Parse Error Detailed:", error);
-        throw new Error(`解析に失敗しました: ${error.message || '不明なエラー'}`);
+        return { success: false, error: `解析中にエラーが発生しました: ${error.message || '不明なエラー'}` };
     }
 }
+
