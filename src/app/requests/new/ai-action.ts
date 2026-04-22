@@ -57,10 +57,10 @@ export async function parseShippingRequest(input: string, products: any[]) {
 ${input}
 
 【住所録データ (JSON) ※ここから該当者を探してください】
-${JSON.stringify(contextAddresses.map(a => ({ id: a.id, company_name: a.company_name, department: a.department, last_name: a.last_name, first_name: a.first_name, phone: a.phone })))}
+${JSON.stringify(contextAddresses.map((a: any) => ({ id: a.id, company_name: a.company_name, department: a.department, last_name: a.last_name, first_name: a.first_name, phone: a.phone })))}
 
 【商品リストデータ (JSON)】
-${JSON.stringify(products.map(p => ({ id: p.id, md_code: p.md_code, product_name: p.product_name })))}
+${JSON.stringify(products.map((p: any) => ({ id: p.id, md_code: p.md_code, product_name: p.product_name })))}
 
 出力形式（JSON）:
 {
