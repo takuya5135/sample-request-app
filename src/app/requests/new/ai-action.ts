@@ -1,8 +1,10 @@
 'use server'
 
 import { GoogleGenAI } from '@google/genai';
+import { createClient } from '@/lib/supabase/server';
+import { generateEmbedding } from '@/lib/ai/embedding';
 
-export async function parseShippingRequest(input: string, addresses: any[], products: any[]) {
+export async function parseShippingRequest(input: string, products: any[]) {
   try {
     // Vercel上の変数名(GEMINI_API_KEY)とローカルの変数名(GOOGLE_GEMINI_API_KEY)の両方に対応
     const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY;
@@ -22,6 +24,26 @@ export async function parseShippingRequest(input: string, addresses: any[], prod
     const dd = String(jstDate.getDate()).padStart(2, '0');
     const todayStr = `${yyyy}-${mm}-${dd}`;
 
+    // --- RAG: ベクトル検索による住所候補の絞り込み ---
+    const supabase = (await createClient()) as any;
+    const inputEmbedding = await generateEmbedding(input);
+    
+    let contextAddresses = [];
+    if (inputEmbedding) {
+        // match_addresses RPC を呼び出して類似住所を検索
+        const { data: matchedRows, error: searchError } = await supabase.rpc('match_addresses', {
+            query_embedding: inputEmbedding,
+            match_threshold: 0.3, // 類似度の閾値
+            match_count: 5        // 上位5件
+        });
+
+        if (!searchError && matchedRows) {
+            contextAddresses = matchedRows;
+        } else if (searchError) {
+            console.error("Vector search error:", searchError);
+        }
+    }
+
     const prompt = `
 あなたは有能なデータ入力アシスタントです。
 現在のシステム日付は【${todayStr}】です。
@@ -34,8 +56,8 @@ export async function parseShippingRequest(input: string, addresses: any[], prod
 【ユーザー入力】
 ${input}
 
-【住所録データ (JSON) ※ここからIDを探してください】
-${JSON.stringify(addresses.map(a => ({ id: a.id, company_name: a.company_name, department: a.department, last_name: a.last_name, first_name: a.first_name, phone: a.phone })))}
+【住所録データ (JSON) ※ここから該当者を探してください】
+${JSON.stringify(contextAddresses.map(a => ({ id: a.id, company_name: a.company_name, department: a.department, last_name: a.last_name, first_name: a.first_name, phone: a.phone })))}
 
 【商品リストデータ (JSON)】
 ${JSON.stringify(products.map(p => ({ id: p.id, md_code: p.md_code, product_name: p.product_name })))}

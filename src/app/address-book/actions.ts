@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { generateEmbedding, getAddressSearchText } from '@/lib/ai/embedding'
 
 export async function deleteAddress(id: string) {
     const supabase = (await createClient()) as any
@@ -32,6 +33,10 @@ export async function updateAddress(id: string, data: any) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { success: false, error: 'ログインが必要です' }
 
+    // Embeddingの生成
+    const searchText = getAddressSearchText(data);
+    const embedding = await generateEmbedding(searchText);
+
     const { error } = await supabase
         .from('address_book')
         .update({
@@ -42,7 +47,8 @@ export async function updateAddress(id: string, data: any) {
             postal_code: data.postal_code,
             address: data.address,
             email: data.email,
-            phone: data.phone
+            phone: data.phone,
+            embedding: embedding // ベクトルデータの保存
         })
         .eq('id', id)
 
@@ -63,6 +69,10 @@ export async function createAddress(data: any) {
         return { success: false, error: 'ログインが必要です' }
     }
 
+    // Embeddingの生成
+    const searchText = getAddressSearchText(data);
+    const embedding = await generateEmbedding(searchText);
+
     const { error } = await supabase
         .from('address_book')
         .insert({
@@ -74,7 +84,8 @@ export async function createAddress(data: any) {
             address: data.address,
             email: data.email,
             phone: data.phone,
-            user_id: user.id
+            user_id: user.id,
+            embedding: embedding // ベクトルデータの保存
         })
 
     if (error) {

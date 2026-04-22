@@ -1,20 +1,11 @@
 'use client'
 
-import { useState } from 'react'
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Search, X } from 'lucide-react'
 import { DuplicateAddressDialog } from './duplicate-dialog'
 import { EditAddressDialog } from './edit-dialog'
 import { DeleteAddressButton } from './delete-button'
+import { useTransition } from 'react'
 
 interface Address {
     id: string
@@ -30,22 +21,28 @@ interface Address {
 }
 
 export function AddressTable({ initialAddresses }: { initialAddresses: Address[] }) {
-    const [searchQuery, setSearchQuery] = useState('')
+    const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
+    const [isPending, startTransition] = useTransition()
+    
+    // 現在の検索クエリ
+    const currentQuery = searchParams.get('q') || ''
 
-    // 検索フィルタリングロジック
-    const filteredAddresses = initialAddresses.filter((address) => {
-        if (!searchQuery) return true
+    const handleSearch = (term: string) => {
+        const params = new URLSearchParams(searchParams)
+        if (term) {
+            params.set('q', term)
+        } else {
+            params.delete('q')
+        }
+        
+        startTransition(() => {
+            router.replace(`${pathname}?${params.toString()}`)
+        })
+    }
 
-        const query = searchQuery.toLowerCase()
-        const fullName = `${address.last_name || ''} ${address.first_name || ''}`.toLowerCase()
-
-        return (
-            (address.company_name?.toLowerCase().includes(query)) ||
-            (address.department?.toLowerCase().includes(query)) ||
-            (fullName.includes(query)) ||
-            (address.phone?.includes(query))
-        )
-    })
+    const filteredAddresses = initialAddresses // サーバーサイドでフィルタリング済み
 
     return (
         <div className="space-y-4">
@@ -54,17 +51,17 @@ export function AddressTable({ initialAddresses }: { initialAddresses: Address[]
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
                 <Input
                     type="text"
-                    placeholder="会社名、氏名、部署名で検索..."
+                    placeholder="会社名、名、氏名で検索..."
                     className="pl-9 pr-8"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    defaultValue={currentQuery}
+                    onChange={(e) => handleSearch(e.target.value)}
                 />
-                {searchQuery && (
+                {currentQuery && (
                     <Button
                         variant="ghost"
                         size="icon"
                         className="absolute right-0 top-0 h-9 w-9 text-gray-400 hover:text-gray-900"
-                        onClick={() => setSearchQuery('')}
+                        onClick={() => handleSearch('')}
                     >
                         <X className="h-4 w-4" />
                         <span className="sr-only">クリア</span>
@@ -75,7 +72,7 @@ export function AddressTable({ initialAddresses }: { initialAddresses: Address[]
             {/* テーブル */}
             {filteredAddresses.length === 0 ? (
                 <div className="py-8 text-center text-gray-500">
-                    {searchQuery ? '検索条件に一致する住所データが見つかりません。' : '登録されている住所データがありません。'}
+                    {currentQuery ? '検索条件に一致する住所データが見つかりません。' : '登録されている住所データがありません。'}
                 </div>
             ) : (
                 <>
@@ -144,7 +141,11 @@ export function AddressTable({ initialAddresses }: { initialAddresses: Address[]
 
             <div className="flex justify-between items-center text-sm text-gray-500 pt-2">
                 <span>
-                    全 {initialAddresses.length} 件中 {filteredAddresses.length} 件を表示
+                    {currentQuery 
+                        ? `検索結果: ${filteredAddresses.length} 件` 
+                        : `登録件数: ${initialAddresses.length} 件 (最大100件を表示)`
+                    }
+                    {isPending && <span className="ml-2 animate-pulse text-indigo-600">検索中...</span>}
                 </span>
             </div>
         </div>

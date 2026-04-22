@@ -154,20 +154,12 @@ export default function RequestFormPage() {
         e.preventDefault()
         startTransition(async () => {
             try {
-                const addressDataForAi = addressOptions.map(opt => ({
-                    id: opt.value,
-                    company_name: opt.label,
-                    department: (opt as any).department,
-                    last_name: (opt as any).last_name,
-                    first_name: (opt as any).first_name,
-                    phone: (opt as any).phone
-                }));
                 const productDataForAi = productOptions.map(opt => ({
                     id: opt.value,
                     product_name: opt.label,
                     md_code: (opt as any).description
                 }));
-                const result = await parseShippingRequest(aiInput, addressDataForAi, productDataForAi);
+                const result = await parseShippingRequest(aiInput, productDataForAi);
 
                 if (!result.success) {
                     alert(result.error || 'AI解析に失敗しました。');

@@ -9,7 +9,12 @@ import { AddressTable } from './address-table'
 
 export const dynamic = 'force-dynamic'
 
-export default async function AddressBookPage() {
+export default async function AddressBookPage({
+    searchParams
+}: {
+    searchParams: Promise<{ q?: string }>
+}) {
+    const { q: query } = await searchParams
     const supabase = (await createClient()) as any
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -33,11 +38,18 @@ export default async function AddressBookPage() {
     }
 
     // 住所録データの取得（削除済みのものは除外）
-    const { data: addresses, error } = await supabase
+    let dbQuery = supabase
         .from('address_book')
         .select('*')
         .neq('is_deleted', true)
+
+    if (query) {
+        dbQuery = dbQuery.or(`company_name.ilike.%${query}%,last_name.ilike.%${query}%,first_name.ilike.%${query}%,phone.ilike.%${query}%`)
+    }
+
+    const { data: addresses, error } = await dbQuery
         .order('created_at', { ascending: false })
+        .limit(100) // 最大100件に制限
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
