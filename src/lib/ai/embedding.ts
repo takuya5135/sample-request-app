@@ -21,7 +21,7 @@ export async function generateEmbedding(text: string): Promise<number[] | null> 
         });
 
         if (result && result.embeddings && result.embeddings.length > 0) {
-            return result.embeddings[0].values;
+            return result.embeddings[0].values ?? null;
         }
         return null;
     } catch (error) {
