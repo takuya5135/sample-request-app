@@ -1,6 +1,16 @@
 'use client'
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { Search, X } from 'lucide-react'
 import { DuplicateAddressDialog } from './duplicate-dialog'
 import { EditAddressDialog } from './edit-dialog'
