@@ -59,11 +59,9 @@ async function migrate() {
                 }
             }));
 
-            // 正しい構文: ai.models.batchEmbedContents を使用
-            const result = await ai.models.batchEmbedContents({
-                model: 'gemini-embedding-2',
-                requests: requests
-            });
+            // モデルインスタンスを取得してバッチ処理を実行
+            const modelInstance = ai.getGenerativeModel({ model: "gemini-embedding-2" });
+            const result = await modelInstance.batchEmbedContents({ requests });
 
             if (result && result.embeddings) {
                 for (let j = 0; j < chunk.length; j++) {
