@@ -81,16 +81,32 @@ ${JSON.stringify(products.map((p: any) => ({ id: p.id, md_code: p.md_code, produ
 ※JSONブロックのみを出力し、マークダウンの装飾記号などは除外してください。
 `;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt,
-    });
+    let resultText = '';
+    let retries = 0;
+    const maxRetries = 3;
 
-    const resultText = typeof response.text === 'function' ? (response as any).text() : response.text;
+    while (retries < maxRetries) {
+      try {
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.0-flash',
+          contents: prompt,
+        });
+        resultText = typeof response.text === 'function' ? (response as any).text() : response.text;
+        if (resultText) break;
+      } catch (error: any) {
+        if (error.status === 429 && retries < maxRetries - 1) {
+          const waitTime = Math.pow(2, retries) * 2000;
+          console.warn(`Gemini GenerateContent 429 limit hit. Retrying in ${waitTime}ms...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          retries++;
+        } else {
+          throw error;
+        }
+      }
+    }
 
     if (!resultText) {
-      console.error("AIからの応答が空です:", response);
-      return { success: false, error: "AIからの応答が空でした。もう一度試してください。" };
+      return { success: false, error: "AIからの応答を取得できませんでした。しばらく待ってから再度お試しください。" };
     }
 
     // jsonパース用の処理

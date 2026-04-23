@@ -14,14 +14,30 @@ export async function generateEmbedding(text: string): Promise<number[] | null> 
 
         const ai = new GoogleGenAI({ apiKey });
         
-        // 最新の gemini-embedding-2 モデルを使用
-        const result = await ai.models.embedContent({
-            model: 'gemini-embedding-2',
-            contents: [text]
-        });
+        let retries = 0;
+        const maxRetries = 3;
 
-        if (result && result.embeddings && result.embeddings.length > 0) {
-            return result.embeddings[0].values ?? null;
+        while (retries < maxRetries) {
+            try {
+                const result = await ai.models.embedContent({
+                    model: 'gemini-embedding-2',
+                    contents: [text]
+                });
+
+                if (result && result.embeddings && result.embeddings.length > 0) {
+                    return result.embeddings[0].values ?? null;
+                }
+                return null;
+            } catch (error: any) {
+                if (error.status === 429 && retries < maxRetries - 1) {
+                    const waitTime = Math.pow(2, retries) * 2000;
+                    console.warn(`Embedding API 429 limit hit. Retrying in ${waitTime}ms...`);
+                    await new Promise(resolve => setTimeout(resolve, waitTime));
+                    retries++;
+                } else {
+                    throw error;
+                }
+            }
         }
         return null;
     } catch (error) {
