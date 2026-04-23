@@ -38,61 +38,63 @@ async function migrate() {
         return
     }
 
-    console.log(`${addresses.length} 件のデータを処理します...`)
+    const BATCH_SIZE = 10;
+    console.log(`${addresses.length} 件のデータを ${BATCH_SIZE} 件ずつのバッチで処理します...`)
 
-    for (const addr of addresses) {
+    for (let i = 0; i < addresses.length; i += BATCH_SIZE) {
+        const chunk = addresses.slice(i, i + BATCH_SIZE);
+        
         try {
-            const searchText = [
-                addr.company_name,
-                addr.department,
-                `${addr.last_name || ''} ${addr.first_name || ''}`.trim(),
-                addr.address
-            ].filter(Boolean).join(' ');
-
-            console.log(`処理中: ${addr.company_name} (${addr.last_name} ${addr.first_name})`)
+            console.log(`バッチ処理中: ${i + 1} 〜 ${Math.min(i + BATCH_SIZE, addresses.length)} 件目...`);
             
-            let embedding = null;
-            let retries = 0;
-            const maxRetries = 3;
+            const requests = chunk.map(addr => ({
+                model: 'models/gemini-embedding-2',
+                content: {
+                    role: 'user',
+                    parts: [{ text: [
+                        addr.company_name,
+                        addr.department,
+                        `${addr.last_name || ''} ${addr.first_name || ''}`.trim(),
+                        addr.address
+                    ].filter(Boolean).join(' ') }]
+                }
+            }));
 
-            while (retries < maxRetries) {
-                try {
-                    const result = await ai.models.embedContent({
-                        model: 'gemini-embedding-2',
-                        contents: [searchText]
-                    });
+            // まとめてベクトル化
+            const result = await ai.getGenerativeModel({ model: "gemini-embedding-2" })
+                .batchEmbedContents({ requests });
 
-                    if (result && result.embeddings && result.embeddings.length > 0) {
-                        embedding = result.embeddings[0].values;
-                        break; // 成功したらループを抜ける
-                    }
-                } catch (err: any) {
-                    if (err.status === 429 && retries < maxRetries - 1) {
-                        const waitTime = Math.pow(2, retries) * 2000; // 2s, 4s, 8s...
-                        console.warn(`  429エラー発生。${waitTime/1000}秒待機してリトライします (${retries + 1}/${maxRetries})`);
-                        await new Promise(resolve => setTimeout(resolve, waitTime));
-                        retries++;
-                    } else {
-                        throw err; // その他のエラー、またはリトライ上限
+            if (result && result.embeddings) {
+                for (let j = 0; j < chunk.length; j++) {
+                    const embedding = result.embeddings[j].values;
+                    const addr = chunk[j];
+
+                    const { error: updateError } = await supabase
+                        .from('address_book')
+                        .update({ embedding })
+                        .eq('id', addr.id);
+
+                    if (updateError) {
+                        console.error(`  更新エラー (ID: ${addr.id}):`, updateError);
                     }
                 }
+                console.log(`  -> ${chunk.length} 件の更新が完了しました。`);
             }
 
-            if (embedding) {
-                const { error: updateError } = await supabase
-                    .from('address_book')
-                    .update({ embedding })
-                    .eq('id', addr.id)
+            // 次のバッチまで5秒待機（無料枠対策）
+            await new Promise(resolve => setTimeout(resolve, 5000));
 
-                if (updateError) {
-                    console.error(`  更新エラー (ID: ${addr.id}):`, updateError)
-                }
+        } catch (err: any) {
+            console.error(`バッチ処理エラー (Index: ${i}):`, err.message);
+            
+            // 429 Resource Exhausted の場合は大幅に待機してリトライ
+            if (err.status === 429 || err.message?.includes('429')) {
+                console.log("制限に達しました。30秒待機してこのバッチをやり直します...");
+                await new Promise(resolve => setTimeout(resolve, 30000));
+                i -= BATCH_SIZE; // ループの加算分を打ち消して同じインデックスから再開
+            } else {
+                console.error("予期せぬエラーが発生したため、このバッチをスキップします。");
             }
-
-            // 次のデータ処理まで一律2秒待機（RPM制限対策）
-            await new Promise(resolve => setTimeout(resolve, 2000));
-        } catch (err) {
-            console.error(`  エラー発生 (ID: ${addr.id}):`, err)
         }
     }
 
