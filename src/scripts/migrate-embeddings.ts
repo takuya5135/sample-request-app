@@ -59,8 +59,9 @@ async function migrate() {
                 }
             }));
 
-            // モデルインスタンスを取得してバッチ処理を実行
-            const modelInstance = ai.getGenerativeModel({ model: "gemini-embedding-2" });
+            // 型エラーを回避するために any キャストを使用
+            const aiAny = ai as any;
+            const modelInstance = aiAny.getGenerativeModel({ model: "gemini-embedding-2" });
             const result = await modelInstance.batchEmbedContents({ requests });
 
             if (result && result.embeddings) {
