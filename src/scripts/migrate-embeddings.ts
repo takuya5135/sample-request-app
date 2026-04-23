@@ -48,7 +48,6 @@ async function migrate() {
             console.log(`バッチ処理中: ${i + 1} 〜 ${Math.min(i + BATCH_SIZE, addresses.length)} 件目...`);
             
             const requests = chunk.map(addr => ({
-                model: 'models/gemini-embedding-2',
                 content: {
                     role: 'user',
                     parts: [{ text: [
@@ -60,9 +59,11 @@ async function migrate() {
                 }
             }));
 
-            // まとめてベクトル化
-            const result = await ai.getGenerativeModel({ model: "gemini-embedding-2" })
-                .batchEmbedContents({ requests });
+            // 正しい構文: ai.models.batchEmbedContents を使用
+            const result = await ai.models.batchEmbedContents({
+                model: 'gemini-embedding-2',
+                requests: requests
+            });
 
             if (result && result.embeddings) {
                 for (let j = 0; j < chunk.length; j++) {
