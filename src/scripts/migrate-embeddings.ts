@@ -68,6 +68,9 @@ async function migrate() {
                     console.error(`  更新エラー (ID: ${addr.id}):`, updateError)
                 }
             }
+
+            // APIレートリミット回避のための1秒待機
+            await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (err) {
             console.error(`  エラー発生 (ID: ${addr.id}):`, err)
         }
