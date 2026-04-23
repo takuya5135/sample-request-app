@@ -52,7 +52,7 @@ async function migrate() {
             console.log(`処理中: ${addr.company_name} (${addr.last_name} ${addr.first_name})`)
             
             const result = await ai.models.embedContent({
-                model: 'models/text-embedding-004',
+                model: 'gemini-embedding-2',
                 contents: [searchText]
             });
 

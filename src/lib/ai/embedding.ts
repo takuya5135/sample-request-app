@@ -14,9 +14,9 @@ export async function generateEmbedding(text: string): Promise<number[] | null> 
 
         const ai = new GoogleGenAI({ apiKey });
         
-        // SDKの仕様に合わせてmodels.embedContentを使用
+        // 最新の gemini-embedding-2 モデルを使用
         const result = await ai.models.embedContent({
-            model: 'models/text-embedding-004',
+            model: 'gemini-embedding-2',
             contents: [text]
         });
 

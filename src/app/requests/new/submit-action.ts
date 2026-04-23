@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { generateEmbedding, getAddressSearchText } from '@/lib/ai/embedding'
 
 export async function createShippingRequest(formData: any) {
     try {
@@ -21,6 +22,17 @@ export async function createShippingRequest(formData: any) {
                 return { success: false, error: '送り先の電話番号は必須です' }
             }
 
+            // Embeddingの生成
+            const addrData = {
+                company_name: formData.companyName,
+                last_name: formData.lastName,
+                first_name: formData.firstName,
+                department: formData.department,
+                address: formData.address
+            };
+            const searchText = getAddressSearchText(addrData);
+            const embedding = await generateEmbedding(searchText);
+
             const { data: newAddr, error: addrErr } = await supabase
                 .from('address_book')
                 .insert({
@@ -31,7 +43,8 @@ export async function createShippingRequest(formData: any) {
                     postal_code: formData.zipCode,
                     address: formData.address,
                     phone: formData.phone,
-                    user_id: formData.saveToAddressBook ? user.id : null 
+                    user_id: formData.saveToAddressBook ? user.id : null,
+                    embedding: embedding // ベクトルデータの保存
                 })
                 .select()
                 .single()
