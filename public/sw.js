@@ -29,8 +29,8 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// インストール要件を満たすためのダミーキャッシュ名
-const CACHE_NAME = 'pwa-cache-v1';
+// インストール要件を満たすための処理
+// fetchイベントリスナー
 
 self.addEventListener('fetch', (event) => {
     // ネットワーク優先、失敗時にキャッシュ（または空の200）を返す

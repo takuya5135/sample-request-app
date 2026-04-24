@@ -61,8 +61,11 @@ async function migrate() {
 
             // 型エラーを回避するために any キャストを使用
             const aiAny = ai as any;
-            const modelInstance = aiAny.getGenerativeModel({ model: "gemini-embedding-2" });
-            const result = await modelInstance.batchEmbedContents({ requests });
+            const modelInstance = aiAny.getGenerativeModel({ model: "text-embedding-004" });
+            const result = await modelInstance.batchEmbedContents({ 
+                requests,
+                config: { outputDimensionality: 3072 }
+            });
 
             if (result && result.embeddings) {
                 for (let j = 0; j < chunk.length; j++) {

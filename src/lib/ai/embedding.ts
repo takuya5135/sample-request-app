@@ -20,8 +20,9 @@ export async function generateEmbedding(text: string): Promise<number[] | null> 
         while (retries < maxRetries) {
             try {
                 const result = await ai.models.embedContent({
-                    model: 'gemini-embedding-2',
-                    contents: [text]
+                    model: 'text-embedding-004',
+                    contents: [text],
+                    config: { outputDimensionality: 3072 }
                 });
 
                 if (result && result.embeddings && result.embeddings.length > 0) {

@@ -88,7 +88,7 @@ ${JSON.stringify(products.map((p: any) => ({ id: p.id, md_code: p.md_code, produ
     while (retries < maxRetries) {
       try {
         const response = await ai.models.generateContent({
-          model: 'gemini-2.0-flash',
+          model: 'gemini-1.5-flash',
           contents: prompt,
         });
         resultText = typeof response.text === 'function' ? (response as any).text() : response.text;
