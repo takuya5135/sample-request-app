@@ -9,6 +9,11 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY;
 
+if (!supabaseUrl || !supabaseServiceKey || !geminiApiKey) {
+    console.error("Missing environment variables: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, or API KEY");
+    process.exit(1);
+}
+
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 const ai = new GoogleGenAI({ apiKey: geminiApiKey });
 
@@ -20,7 +25,12 @@ async function testSearch() {
         model: 'gemini-embedding-2',
         contents: [query]
     });
-    const embedding = result.embeddings[0].values;
+    const embedding = result?.embeddings?.[0]?.values;
+
+    if (!embedding) {
+        console.error("Failed to generate embedding");
+        return;
+    }
 
     const { data, error } = await supabase.rpc('match_addresses', {
         query_embedding: embedding,

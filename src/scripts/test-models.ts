@@ -11,7 +11,7 @@ if (!apiKey) {
     process.exit(1);
 }
 
-const genAI = new GoogleGenAI({ apiKey });
+const genAI = new GoogleGenAI({ apiKey: apiKey as string });
 
 async function listModels() {
     try {
