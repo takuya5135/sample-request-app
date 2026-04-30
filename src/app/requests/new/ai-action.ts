@@ -2,7 +2,6 @@
 
 import { GoogleGenAI } from '@google/genai';
 import { createClient } from '@/lib/supabase/server';
-import { generateEmbedding } from '@/lib/ai/embedding';
 
 export async function parseShippingRequest(input: string, products: any[]) {
   try {
@@ -24,24 +23,20 @@ export async function parseShippingRequest(input: string, products: any[]) {
     const dd = String(jstDate.getDate()).padStart(2, '0');
     const todayStr = `${yyyy}-${mm}-${dd}`;
 
-    // --- RAG: ベクトル検索による住所候補の絞り込み ---
+    // --- 直接取得: RAGを廃止し、最新のアドレス帳を直接取得してLLMに渡す ---
     const supabase = (await createClient()) as any;
-    const inputEmbedding = await generateEmbedding(input);
     
     let contextAddresses = [];
-    if (inputEmbedding) {
-        // match_addresses RPC を呼び出して類似住所を検索
-        const { data: matchedRows, error: searchError } = await supabase.rpc('match_addresses', {
-            query_embedding: inputEmbedding,
-            match_threshold: 0.3, // 類似度の閾値
-            match_count: 5        // 上位5件
-        });
+    const { data: addresses, error: fetchError } = await supabase
+        .from('address_book')
+        .select('id, company_name, department, last_name, first_name, phone')
+        .order('created_at', { ascending: false })
+        .limit(1000);
 
-        if (!searchError && matchedRows) {
-            contextAddresses = matchedRows;
-        } else if (searchError) {
-            console.error("Vector search error:", searchError);
-        }
+    if (!fetchError && addresses) {
+        contextAddresses = addresses;
+    } else if (fetchError) {
+        console.error("Address fetch error:", fetchError);
     }
 
     const prompt = `
